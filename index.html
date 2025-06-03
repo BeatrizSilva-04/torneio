@@ -5,85 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3º ARMIL CUP - Torneio de Futsal</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .tournament-title {
-            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #1e40af 100%);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .tournament-title::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        .edition-number {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #fbbf24;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            line-height: 1;
-            margin-bottom: 0.25rem;
-        }
-        
-        .date-text {
-            font-size: 0.875rem;
-            color: #e0f2fe;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-        
-        .main-title {
-            font-size: 3rem;
-            font-weight: 900;
-            color: white;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
-            letter-spacing: 0.05em;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        
-        .venue-text {
-            font-size: 1rem;
-            color: #e0f2fe;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .categories-text {
-            font-size: 0.875rem;
-            color: #bae6fd;
-            font-weight: 500;
-        }
-        
-        @media (max-width: 768px) {
-            .edition-number {
-                font-size: 2rem;
-            }
-            .main-title {
-                font-size: 2rem;
-            }
-            .venue-text {
-                font-size: 0.875rem;
-            }
-        }
-        
         .animate-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
@@ -342,15 +264,9 @@
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-8">
-            <!-- Tournament Title Card -->
-            <div class="tournament-title">
-                <div class="edition-number">3º</div>
-                <div class="date-text">7 de junho</div>
-                <div class="main-title">ARMIL CUP</div>
-                <div class="venue-text">Campo do Armil</div>
-                <div class="categories-text">Petizes, Traquinas e Benjamins</div>
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <img src="armil.png" alt="3º ARMIL CUP" class="rounded-lg shadow-lg w-32 h-auto object-contain">
             </div>
-            
             <div class="flex items-center justify-center gap-4">
                 <div class="flex items-center gap-2 text-sm text-gray-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
@@ -735,7 +651,7 @@
                 name: "Traquinas",
                 groups: {
                     I: ["Armil", "Fornelos B", "Quinchães"],
-                    II: ["Fornelos A", "Paços", "Marinhão"],
+                    II: ["Fornelos A", "Vasco da Gama", "Marinhão"],
                 },
                 manualStandings: {
                     I: null,
@@ -746,7 +662,7 @@
                         id: 13,
                         time: "14:30",
                         team1: "Armil",
-                        team2: "Sousa",
+                        team2: "Fornelos B",
                         field: "Campo Dudidi",
                         jornada: 1,
                         status: "upcoming",
@@ -756,8 +672,8 @@
                     {
                         id: 14,
                         time: "14:30",
-                        team1: "Marinhão",
-                        team2: "Fornelos B",
+                        team1: "Vasco da Gama",
+                        team2: "Fornelos A",
                         field: "Campo Predimed",
                         jornada: 1,
                         status: "upcoming",
@@ -800,7 +716,7 @@
                     {
                         id: 18,
                         time: "16:00",
-                        team1: "Paços",
+                        team1: "Vasco da Gama",
                         team2: "Marinhão",
                         field: "Campo Predimed",
                         jornada: 3,
@@ -819,7 +735,7 @@
                 name: "Benjamins",
                 groups: {
                     I: ["Armil", "Sousa", "Marinhão"],
-                    II: ["Fornelos", "Paços", "Quinchães"],
+                    II: ["Fornelos", "Serafão", "Quinchães"],
                 },
                 manualStandings: {
                     I: null,
@@ -841,7 +757,7 @@
                         id: 20,
                         time: "14:30",
                         team1: "Fornelos",
-                        team2: "Paços",
+                        team2: "Serafão",
                         field: "Campo Farmácia Albarelos",
                         jornada: 1,
                         status: "upcoming",
@@ -862,7 +778,7 @@
                     {
                         id: 22,
                         time: "15:15",
-                        team1: "Paços",
+                        team1: "Serafão",
                         team2: "Quinchães",
                         field: "Campo Predimed",
                         jornada: 2,
@@ -1511,4 +1427,5 @@
     </script>
 </body>
 </html>
+
 

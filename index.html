@@ -514,6 +514,14 @@
                 font-size: 1.125rem;
             }
         }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
     </style>
 </head>
 
@@ -555,15 +563,14 @@
                 </button>
             </div>
             <div class="mt-2" id="admin-badge" style="display: none;">
-    <span class="badge badge-destructive animate-pulse">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        MODO ADMINISTRADOR ATIVO
-    </span>
-    <button id="reset-db-btn" class="btn btn-destructive btn-sm mt-2">Reinicializar Dados</button>
-`;
+                <span class="badge badge-destructive animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    MODO ADMINISTRADOR ATIVO
+                </span>
+                <button id="reset-db-btn" class="btn btn-destructive btn-sm mt-2">Reinicializar Dados</button>
             </div>
         </div>
 
@@ -626,13 +633,13 @@
 
             <!-- Tab Contents -->
             <div id="petizes" class="tab-content active space-y-6">
-                <!-- Conteúdo será preenchido dinamicamente -->
+                <div class="loading">Carregando dados dos Petizes...</div>
             </div>
             <div id="traquinas" class="tab-content space-y-6">
-                <!-- Conteúdo será preenchido dinamicamente -->
+                <div class="loading">Carregando dados dos Traquinas...</div>
             </div>
             <div id="benjamins" class="tab-content space-y-6">
-                <!-- Conteúdo será preenchido dinamicamente -->
+                <div class="loading">Carregando dados dos Benjamins...</div>
             </div>
         </div>
 
@@ -778,6 +785,11 @@
         let isAdminMode = false;
         let editingMatch = null;
         let editingStandings = null;
+        let dataLoaded = {
+            petizes: false,
+            traquinas: false,
+            benjamins: false
+        };
 
         // ============= Dados Iniciais Atualizados =============
         const initialTournamentData = {
@@ -1206,16 +1218,16 @@
         // ============= Função para calcular classificações =============
         function calculateStandings(category) {
             const data = tournamentData[category];
-            if (!data) return { I: {} };
+            if (!data || !data.groups) return {};
             
-            const standings = { I: {} };
+            const standings = {};
 
-            // Se existem classificações manuais, usar essas
-            if (data.manualStandings && data.manualStandings.I) {
-                standings.I = data.manualStandings.I;
-            } else {
-                // Inicializar todas as equipas para cálculo automático
-                Object.entries(data.groups).forEach(([groupName, teams]) => {
+            // Inicializar standings para cada grupo
+            Object.entries(data.groups).forEach(([groupName, teams]) => {
+                if (data.manualStandings && data.manualStandings[groupName]) {
+                    standings[groupName] = data.manualStandings[groupName];
+                } else {
+                    standings[groupName] = {};
                     teams.forEach((team) => {
                         standings[groupName][team] = {
                             team,
@@ -1228,49 +1240,55 @@
                             ga: 0,
                         };
                     });
-                });
-            }
-
-            data.matches.forEach((match) => {
-                if (match.status === "finished") {
-                    let team1Group = null;
-                    let team2Group = null;
-
-                    Object.entries(data.groups).forEach(([groupName, teams]) => {
-                        if (teams.includes(match.team1)) team1Group = groupName;
-                        if (teams.includes(match.team2)) team2Group = groupName;
-                    });
-
-                    if (team1Group && team2Group && team1Group === team2Group && (!data.manualStandings || !data.manualStandings[team1Group])) {
-                        const group = team1Group;
-                        const team1Stats = standings[group][match.team1];
-                        const team2Stats = standings[group][match.team2];
-
-                        team1Stats.played++;
-                        team2Stats.played++;
-                        team1Stats.gf += match.score1;
-                        team1Stats.ga += match.score2;
-                        team2Stats.gf += match.score2;
-                        team2Stats.ga += match.score1;
-
-                        if (match.score1 > match.score2) {
-                            team1Stats.wins++;
-                            team1Stats.points += 3;
-                            team2Stats.losses++;
-                        } else if (match.score1 < match.score2) {
-                            team2Stats.wins++;
-                            team2Stats.points += 3;
-                            team1Stats.losses++;
-                        } else {
-                            team1Stats.draws++;
-                            team2Stats.draws++;
-                            team1Stats.points += 1;
-                            team2Stats.points += 1;
-                        }
-                    }
                 }
             });
 
+            // Calcular estatísticas baseadas nos jogos terminados
+            if (data.matches) {
+                data.matches.forEach((match) => {
+                    if (match.status === "finished") {
+                        let team1Group = null;
+                        let team2Group = null;
+
+                        Object.entries(data.groups).forEach(([groupName, teams]) => {
+                            if (teams.includes(match.team1)) team1Group = groupName;
+                            if (teams.includes(match.team2)) team2Group = groupName;
+                        });
+
+                        if (team1Group && team2Group && team1Group === team2Group && (!data.manualStandings || !data.manualStandings[team1Group])) {
+                            const group = team1Group;
+                            const team1Stats = standings[group][match.team1];
+                            const team2Stats = standings[group][match.team2];
+
+                            if (team1Stats && team2Stats) {
+                                team1Stats.played++;
+                                team2Stats.played++;
+                                team1Stats.gf += match.score1;
+                                team1Stats.ga += match.score2;
+                                team2Stats.gf += match.score2;
+                                team2Stats.ga += match.score1;
+
+                                if (match.score1 > match.score2) {
+                                    team1Stats.wins++;
+                                    team1Stats.points += 3;
+                                    team2Stats.losses++;
+                                } else if (match.score1 < match.score2) {
+                                    team2Stats.wins++;
+                                    team2Stats.points += 3;
+                                    team1Stats.losses++;
+                                } else {
+                                    team1Stats.draws++;
+                                    team2Stats.draws++;
+                                    team1Stats.points += 1;
+                                    team2Stats.points += 1;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Ordenar por pontos
             Object.keys(standings).forEach((group) => {
                 if (!data.manualStandings || !data.manualStandings[group]) {
                     standings[group] = Object.values(standings[group]).sort(
@@ -1321,175 +1339,175 @@
             }
         }
 
-        function renderDashboard() {
-            // Só renderiza quando já carregamos todos os dados
-            if (!tournamentData.petizes || !tournamentData.traquinas || !tournamentData.benjamins) {
+        function renderCategory(category) {
+            const data = tournamentData[category];
+            if (!data) {
+                document.getElementById(category).innerHTML = `<div class="loading">Carregando dados dos ${data?.name || category}...</div>`;
                 return;
             }
 
-            ["petizes", "traquinas", "benjamins"].forEach((category) => {
-                const data = tournamentData[category];
-                const standings = calculateStandings(category);
+            const standings = calculateStandings(category);
 
-                let html = `
-                    <div class="grid lg:grid-cols-2 gap-6">
-                        <!-- Classificações -->
-                        <div class="space-y-4">
+            let html = `
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Classificações -->
+                    <div class="space-y-4">
+            `;
+
+            Object.entries(data.groups).forEach(([groupName, teams]) => {
+                const isManual = data.manualStandings && data.manualStandings[groupName];
+                html += `
+                    <div class="standings-card">
+                        <div class="standings-header flex items-center justify-between">
+                            <h3 class="standings-title">Grupo ${groupName}</h3>
+                            ${isAdminMode ? `
+                                <div class="flex items-center gap-2">
+                                    ${isManual ? '<span class="badge badge-outline text-xs">Manual</span>' : '<span class="badge badge-outline text-xs">Auto</span>'}
+                                    <button class="btn btn-outline btn-sm edit-standings-btn" data-category="${category}" data-group="${groupName}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="standings-content">
+                            <div class="standings-table-header">
+                                <span>Pos</span>
+                                <span>Equipa</span>
+                                <span>Pts</span>
+                                <span>J</span>
+                            </div>
                 `;
 
-                Object.entries(data.groups).forEach(([groupName, teams]) => {
-                    const isManual = data.manualStandings && data.manualStandings[groupName];
+                if (standings[groupName]) {
+                    const arr = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
+                    arr.forEach((team, index) => {
+                        html += `
+                            <div class="standings-row">
+                                <span class="position">${index + 1}º</span>
+                                <span class="team-name">${team.team}</span>
+                                <span class="points">${team.points}</span>
+                                <span class="games">${team.played}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+
+                    <!-- Jogos -->
+                    <div class="space-y-4">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-500">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Jogos
+                        </h2>
+            `;
+
+            // Determinar número de jornadas baseado na categoria
+            const maxJornadas = category === "petizes" ? 3 : 5;
+            
+            for (let jornada = 1; jornada <= maxJornadas; jornada++) {
+                const jornadaMatches = data.matches ? data.matches.filter((match) => match.jornada === jornada) : [];
+                if (!jornadaMatches || jornadaMatches.length === 0) continue;
+
+                html += `
+                    <div class="standings-card">
+                        <div class="standings-header">
+                            <h3 class="standings-title">Jornada ${jornada}</h3>
+                        </div>
+                        <div class="standings-content p-6">
+                            <div class="space-y-3">
+                `;
+
+                jornadaMatches.forEach((match) => {
                     html += `
-                        <div class="standings-card">
-                            <div class="standings-header flex items-center justify-between">
-                                <h3 class="standings-title">Grupo ${groupName}</h3>
-                                ${isAdminMode ? `
-                                    <div class="flex items-center gap-2">
-                                        ${isManual ? '<span class="badge badge-outline text-xs">Manual</span>' : '<span class="badge badge-outline text-xs">Auto</span>'}
-                                        <button class="btn btn-outline btn-sm edit-standings-btn" data-category="${category}" data-group="${groupName}">
+                        <div class="match-card">
+                            <div class="match-header">
+                                <div class="match-teams">${match.team1} vs ${match.team2}</div>
+                                ${match.status !== "upcoming" ? `<div class="match-score">${match.score1} - ${match.score2}</div>` : ''}
+                            </div>
+                            <div class="match-info">
+                                <div class="match-time-field">
+                                    <span class="match-time">${match.time}</span>
+                                    <div class="match-field">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                        <span>${match.field}</span>
+                                    </div>
+                                </div>
+                                <div class="match-actions">
+                                    ${getStatusBadge(match.status)}
+                                    ${isAdminMode ? `
+                                        <button class="btn btn-outline btn-sm edit-match-btn" data-match-id="${match.id}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
                                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                             </svg>
                                         </button>
-                                    </div>
-                                ` : ''}
-                            </div>
-                            <div class="standings-content">
-                                <div class="standings-table-header">
-                                    <span>Pos</span>
-                                    <span>Equipa</span>
-                                    <span>Pts</span>
-                                    <span>J</span>
+                                    ` : ''}
                                 </div>
-                    `;
-
-                    if (standings[groupName]) {
-                        const arr = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
-                        arr.forEach((team, index) => {
-                            html += `
-                                <div class="standings-row">
-                                    <span class="position">${index + 1}º</span>
-                                    <span class="team-name">${team.team}</span>
-                                    <span class="points">${team.points}</span>
-                                    <span class="games">${team.played}</span>
-                                </div>
-                            `;
-                        });
-                    }
-
-                    html += `
                             </div>
                         </div>
                     `;
                 });
 
                 html += `
-                        </div>
-
-                        <!-- Jogos -->
-                        <div class="space-y-4">
-                            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-500">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                Jogos
-                            </h2>
+                            </div>
                 `;
 
-                // Determinar número de jornadas baseado na categoria
-                const maxJornadas = category === "petizes" ? 3 : 5;
-                
-                for (let jornada = 1; jornada <= maxJornadas; jornada++) {
-                    const jornadaMatches = data.matches.filter((match) => match.jornada === jornada);
-                    if (!jornadaMatches || jornadaMatches.length === 0) continue;
-
+                // Adicionar intervalo para lanche após jornada 3 (apenas para Traquinas e Benjamins)
+                if (jornada === 3 && category !== "petizes") {
                     html += `
-                        <div class="standings-card">
-                            <div class="standings-header">
-                                <h3 class="standings-title">Jornada ${jornada}</h3>
-                            </div>
-                            <div class="standings-content p-6">
-                                <div class="space-y-3">
-                    `;
-
-                    jornadaMatches.forEach((match) => {
-                        html += `
-                            <div class="match-card">
-                                <div class="match-header">
-                                    <div class="match-teams">${match.team1} vs ${match.team2}</div>
-                                    ${match.status !== "upcoming" ? `<div class="match-score">${match.score1} - ${match.score2}</div>` : ''}
-                                </div>
-                                <div class="match-info">
-                                    <div class="match-time-field">
-                                        <span class="match-time">${match.time}</span>
-                                        <div class="match-field">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
-                                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                                <circle cx="12" cy="10" r="3"></circle>
-                                            </svg>
-                                            <span>${match.field}</span>
-                                        </div>
-                                    </div>
-                                    <div class="match-actions">
-                                        ${getStatusBadge(match.status)}
-                                        ${isAdminMode ? `
-                                            <button class="btn btn-outline btn-sm edit-match-btn" data-match-id="${match.id}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
-                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    html += `
-                                </div>
-                    `;
-
-                    // Adicionar intervalo para lanche após jornada 3 (apenas para Traquinas e Benjamins)
-                    if (jornada === 3 && category !== "petizes") {
-                        html += `
-                            <div class="mt-4 p-3 bg-blue-50 rounded-lg text-center">
-                                <p class="text-sm text-blue-700 font-medium">
-                                    ⏰ Intervalo de 30 min para lanche
-                                </p>
-                            </div>
-                        `;
-                    }
-
-                    html += `
-                            </div>
+                        <div class="mt-4 p-3 bg-blue-50 rounded-lg text-center">
+                            <p class="text-sm text-blue-700 font-medium">
+                                ⏰ Intervalo de 30 min para lanche
+                            </p>
                         </div>
                     `;
                 }
 
                 html += `
-                    <div class="standings-card">
-                        <div class="standings-header">
-                            <h3 class="standings-title flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-yellow-500">
-                                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                                    <path d="M4 22h16"></path>
-                                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-                                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-                                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                                </svg>
-                                ${category === "petizes" ? "Finais" : "Entrega de Prémios"}
-                            </h3>
                         </div>
-                        <div class="standings-content p-6">
-                            <div class="space-y-3">
+                    </div>
                 `;
+            }
 
+            html += `
+                <div class="standings-card">
+                    <div class="standings-header">
+                        <h3 class="standings-title flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-yellow-500">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                <path d="M4 22h16"></path>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                            </svg>
+                            ${category === "petizes" ? "Finais" : "Entrega de Prémios"}
+                        </h3>
+                    </div>
+                    <div class="standings-content p-6">
+                        <div class="space-y-3">
+            `;
+
+            if (data.finals) {
                 data.finals.forEach((final) => {
                     if (category === "petizes") {
                         html += `
@@ -1523,71 +1541,86 @@
                         `;
                     }
                 });
+            }
 
-                html += `
-                            </div>
+            html += `
                         </div>
                     </div>
                 </div>
             </div>
-                `;
+        </div>
+            `;
 
-                document.getElementById(category).innerHTML = html;
+            document.getElementById(category).innerHTML = html;
+            setupEventListeners();
+        }
+
+        function renderDashboard() {
+            // Renderizar todas as categorias que já foram carregadas
+            ["petizes", "traquinas", "benjamins"].forEach((category) => {
+                if (dataLoaded[category]) {
+                    renderCategory(category);
+                }
             });
 
             // Mostrar ou esconder "Jogos ao Vivo"
-            const liveMatches = tournamentData[activeCategory].matches.filter(match => match.status === "live");
-            const liveMatchesContainer = document.getElementById('live-matches-container');
-            const liveMatchesList = document.getElementById('live-matches-list');
-            const liveMatchesTitle = document.getElementById('live-matches-title');
+            if (dataLoaded[activeCategory] && tournamentData[activeCategory]) {
+                const liveMatches = tournamentData[activeCategory].matches ? 
+                    tournamentData[activeCategory].matches.filter(match => match.status === "live") : [];
+                const liveMatchesContainer = document.getElementById('live-matches-container');
+                const liveMatchesList = document.getElementById('live-matches-list');
+                const liveMatchesTitle = document.getElementById('live-matches-title');
 
-            if (liveMatches.length > 0) {
-                liveMatchesContainer.style.display = 'block';
-                liveMatchesTitle.textContent = `Jogos ao Vivo - ${tournamentData[activeCategory].name}`;
+                if (liveMatches.length > 0) {
+                    liveMatchesContainer.style.display = 'block';
+                    liveMatchesTitle.textContent = `Jogos ao Vivo - ${tournamentData[activeCategory].name}`;
 
-                let liveMatchesHtml = '';
-                liveMatches.forEach(match => {
-                    liveMatchesHtml += `
-                        <div class="match-card border-red-200 bg-white">
-                            <div class="match-header">
-                                <div class="match-teams">${match.team1} vs ${match.team2}</div>
-                                <div class="match-score">${match.score1} - ${match.score2}</div>
-                            </div>
-                            <div class="match-info">
-                                <div class="match-time-field">
-                                    <div class="match-field">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
-                                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                            <circle cx="12" cy="10" r="3"></circle>
-                                        </svg>
-                                        <span>${match.field}</span>
+                    let liveMatchesHtml = '';
+                    liveMatches.forEach(match => {
+                        liveMatchesHtml += `
+                            <div class="match-card border-red-200 bg-white">
+                                <div class="match-header">
+                                    <div class="match-teams">${match.team1} vs ${match.team2}</div>
+                                    <div class="match-score">${match.score1} - ${match.score2}</div>
+                                </div>
+                                <div class="match-info">
+                                    <div class="match-time-field">
+                                        <div class="match-field">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                                <circle cx="12" cy="10" r="3"></circle>
+                                            </svg>
+                                            <span>${match.field}</span>
+                                        </div>
+                                    </div>
+                                    <div class="match-actions">
+                                        <span class="badge badge-destructive animate-pulse">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1">
+                                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                            </svg>
+                                            AO VIVO
+                                        </span>
+                                        ${isAdminMode ? `
+                                            <button class="btn btn-outline btn-sm edit-match-btn" data-match-id="${match.id}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                </svg>
+                                            </button>
+                                        ` : ''}
                                     </div>
                                 </div>
-                                <div class="match-actions">
-                                    <span class="badge badge-destructive animate-pulse">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1">
-                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                        </svg>
-                                        AO VIVO
-                                    </span>
-                                    ${isAdminMode ? `
-                                        <button class="btn btn-outline btn-sm edit-match-btn" data-match-id="${match.id}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                            </svg>
-                                        </button>
-                                    ` : ''}
-                                </div>
                             </div>
-                        </div>
-                    `;
-                });
-                liveMatchesList.innerHTML = liveMatchesHtml;
-            } else {
-                liveMatchesContainer.style.display = 'none';
+                        `;
+                    });
+                    liveMatchesList.innerHTML = liveMatchesHtml;
+                } else {
+                    liveMatchesContainer.style.display = 'none';
+                }
             }
+        }
 
+        function setupEventListeners() {
             // Estabelece event listeners para botões "Editar" após re-render
             document.querySelectorAll('.edit-match-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
@@ -1596,7 +1629,7 @@
 
                     // Encontrar o jogo em todas as categorias
                     ["petizes", "traquinas", "benjamins"].forEach(category => {
-                        const arr = tournamentData[category].matches || [];
+                        const arr = tournamentData[category]?.matches || [];
                         arr.forEach(m => { if (m.id === matchId) match = m; });
                     });
 
@@ -1796,21 +1829,7 @@
             editingStandings = null;
         });
 
-        // ============= Listeners do Firebase para Carregar Dados =============
-        // Modifique a função listenToCategory para forçar a atualização dos dados no Firebase
-        function listenToCategory(category) {
-            const catRef = db.ref('tournament/' + category);
-            catRef.on('value', snapshot => {
-                const data = snapshot.val();
-                // Forçar atualização dos dados para o novo formato
-                console.log(`Atualizando dados para ${category}`);
-                db.ref('tournament/' + category).set(initialTournamentData[category]);
-                tournamentData[category] = initialTournamentData[category];
-                renderDashboard();
-            });
-        }
-
-        // Adicione esta função para limpar e reinicializar o Firebase
+        // ============= Função para reinicializar dados =============
         function resetDatabase() {
             if (confirm("Tem certeza que deseja reinicializar todos os dados? Isso irá apagar todos os resultados existentes.")) {
                 db.ref('tournament').remove().then(() => {
@@ -1827,41 +1846,40 @@
             }
         }
 
-        // Adicione um botão de reset no painel de administrador
-        document.getElementById('admin-badge').innerHTML = `
-    <span class="badge badge-destructive animate-pulse">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        MODO ADMINISTRADOR ATIVO
-    </span>
-    <button id="reset-db-btn" class="btn btn-destructive btn-sm mt-2">Reinicializar Dados</button>
-`;
-
-        // Adicione o event listener para o botão de reset
-        document.addEventListener('DOMContentLoaded', function() {
-            // Outros event listeners...
-    
-            // Adicione este event listener quando o DOM estiver carregado
-            document.getElementById('admin-logout-btn').addEventListener('click', function() {
-                isAdminMode = false;
-                document.getElementById('admin-login-btn').style.display = 'inline-flex';
-                document.getElementById('admin-logout-btn').style.display = 'none';
-                document.getElementById('admin-badge').style.display = 'none';
-                renderDashboard();
-            });
-    
-            // Event listener para o botão de reset
-            document.body.addEventListener('click', function(e) {
-                if (e.target && e.target.id === 'reset-db-btn') {
-                    resetDatabase();
-                }
-            });
+        // Event listener para o botão de reset
+        document.body.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'reset-db-btn') {
+                resetDatabase();
+            }
         });
+
+        // ============= Listeners do Firebase para Carregar Dados =============
+        function listenToCategory(category) {
+            const catRef = db.ref('tournament/' + category);
+            catRef.on('value', snapshot => {
+                const data = snapshot.val();
+                console.log(`Dados recebidos para ${category}:`, data);
+                
+                if (data === null) {
+                    // Se não existe dados no Firebase, usar dados iniciais
+                    console.log(`Inicializando dados para ${category}`);
+                    db.ref('tournament/' + category).set(initialTournamentData[category]);
+                    tournamentData[category] = initialTournamentData[category];
+                } else {
+                    tournamentData[category] = data;
+                }
+                
+                dataLoaded[category] = true;
+                renderDashboard();
+            }, error => {
+                console.error(`Erro ao carregar dados para ${category}:`, error);
+                document.getElementById(category).innerHTML = `<div class="loading">Erro ao carregar dados dos ${category}</div>`;
+            });
+        }
 
         // Fazer o listener para cada categoria
         ['petizes', 'traquinas', 'benjamins'].forEach(cat => listenToCategory(cat));
     </script>
 </body>
 </html>
+

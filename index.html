@@ -5,8 +5,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3º ARMIL CUP - Torneio de Futsal</title>
+    <!-- Tailwind CSS original -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
     <style>
+        /* === (Todo o seu CSS original abaixo, sem alterações) === */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tournament-title {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #1e40af 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tournament-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .edition-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fbbf24;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .date-text {
+            font-size: 0.875rem;
+            color: #e0f2fe;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.05em;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .venue-text {
+            font-size: 1rem;
+            color: #e0f2fe;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .categories-text {
+            font-size: 0.875rem;
+            color: #bae6fd;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .edition-number {
+                font-size: 2rem;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .venue-text {
+                font-size: 0.875rem;
+            }
+        }
+
         .animate-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
@@ -263,15 +347,28 @@
             font-size: 0.875rem;
         }
     </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- (Opcional) Se quiser autenticar administradores via Firebase Auth, basta incluir:
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    -->
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-8">
-            <div class="flex items-center justify-center gap-4 mb-4">
-                <img src="armil.png" alt="3º ARMIL CUP" class="rounded-lg shadow-lg w-32 h-auto object-contain">
+            <!-- Tournament Title Card -->
+            <div class="tournament-title">
+                <div class="edition-number">3º</div>
+                <div class="date-text">7 de junho</div>
+                <div class="main-title">ARMIL CUP</div>
+                <div class="venue-text">Campo do Armil</div>
+                <div class="categories-text">Petizes, Traquinas e Benjamins</div>
             </div>
+
             <div class="flex items-center justify-center gap-4">
                 <div class="flex items-center gap-2 text-sm text-gray-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -385,13 +482,13 @@
 
             <!-- Tab Contents -->
             <div id="petizes" class="tab-content active space-y-6">
-                <!-- Content will be inserted here -->
+                <!-- Conteúdo será preenchido dinamicamente -->
             </div>
             <div id="traquinas" class="tab-content space-y-6">
-                <!-- Content will be inserted here -->
+                <!-- Conteúdo será preenchido dinamicamente -->
             </div>
             <div id="benjamins" class="tab-content space-y-6">
-                <!-- Content will be inserted here -->
+                <!-- Conteúdo será preenchido dinamicamente -->
             </div>
         </div>
 
@@ -503,7 +600,7 @@
                 </div>
                 <div class="space-y-4">
                     <div id="standings-edit-list">
-                        <!-- Standings edit fields will be inserted here -->
+                        <!-- Standings edit fields serão inseridos aqui -->
                     </div>
 
                     <div class="flex gap-2">
@@ -517,14 +614,11 @@
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-
-        // Configuração do Firebase
+    <script>
+        // ============= Fireabase Initialization =============
         const firebaseConfig = {
             apiKey: "AIzaSyBjmAXfeufT4nUhz8QC8MSJBLroYzKQWRg",
             authDomain: "armil-f539f.firebaseapp.com",
@@ -535,356 +629,22 @@
             appId: "1:954636521330:web:7170da80b622aaf0be17eb",
             measurementId: "G-4S06F7NJZ2"
         };
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        // Tornar as funções disponíveis globalmente
-        window.firebaseApp = app;
-        window.firebaseDatabase = database;
-        window.firebaseRef = ref;
-        window.firebaseSet = set;
-        window.firebaseGet = get;
-        window.firebaseOnValue = onValue;
-        window.firebaseUpdate = update;
-
-        // Password do administrador
-        const ADMIN_PASSWORD = "admin2024";
-
-        // Dados iniciais do torneio
-        const initialTournamentData = {
-            petizes: {
-                name: "Petizes",
-                groups: {
-                    I: ["Armil", "Sousa", "Marinhão", "Fornelos B"],
-                    II: ["Ases", "Celorico", "Quinchães", "Fornelos A"],
-                },
-                manualStandings: {
-                    I: null,
-                    II: null
-                },
-                matches: [
-                    // Jornada 1
-                    {
-                        id: 1,
-                        time: "09:00",
-                        team1: "Armil",
-                        team2: "Sousa",
-                        field: "Campo Dudidi",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 2,
-                        time: "09:00",
-                        team1: "Marinhão",
-                        team2: "Fornelos B",
-                        field: "Campo Predimed",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 3,
-                        time: "09:00",
-                        team1: "Ases",
-                        team2: "Celorico",
-                        field: "Campo Gsport",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 4,
-                        time: "09:00",
-                        team1: "Quinchães",
-                        team2: "Fornelos A",
-                        field: "Campo Farmácia Albarelos",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    // Jornada 2
-                    {
-                        id: 5,
-                        time: "09:30",
-                        team1: "Armil",
-                        team2: "Marinhão",
-                        field: "Campo Farmácia Albarelos",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 6,
-                        time: "09:30",
-                        team1: "Sousa",
-                        team2: "Fornelos B",
-                        field: "Campo Gsport",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 7,
-                        time: "09:30",
-                        team1: "Ases",
-                        team2: "Quinchães",
-                        field: "Campo Predimed",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 8,
-                        time: "09:30",
-                        team1: "Celorico",
-                        team2: "Fornelos A",
-                        field: "Campo Dudidi",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    // Jornada 3
-                    {
-                        id: 9,
-                        time: "10:00",
-                        team1: "Armil",
-                        team2: "Fornelos B",
-                        field: "Campo Farmácia Albarelos",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 10,
-                        time: "10:00",
-                        team1: "Sousa",
-                        team2: "Marinhão",
-                        field: "Campo Dudidi",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 11,
-                        time: "10:00",
-                        team1: "Ases",
-                        team2: "Fornelos A",
-                        field: "Campo Gsport",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 12,
-                        time: "10:00",
-                        team1: "Celorico",
-                        team2: "Quinchães",
-                        field: "Campo Predimed",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                ],
-                finals: [
-                    { time: "10:45", match: "4º lugar Grupo I vs 4º lugar Grupo II", field: "Campo Gsport" },
-                    { time: "10:45", match: "3º lugar Grupo I vs 3º lugar Grupo II", field: "Campo Predimed" },
-                    { time: "10:45", match: "2º lugar Grupo I vs 2º lugar Grupo II", field: "Campo Farmácia Albarelos" },
-                    { time: "10:45", match: "1º lugar Grupo I vs 1º lugar Grupo II", field: "Campo Dudidi" },
-                ],
-            },
-            traquinas: {
-                name: "Traquinas",
-                groups: {
-                    I: ["Armil", "Fornelos B", "Quinchães"],
-                    II: ["Fornelos A", "Vasco da Gama", "Marinhão"],
-                },
-                manualStandings: {
-                    I: null,
-                    II: null
-                },
-                matches: [
-                    {
-                        id: 13,
-                        time: "14:30",
-                        team1: "Armil",
-                        team2: "Fornelos B",
-                        field: "Campo Dudidi",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 14,
-                        time: "14:30",
-                        team1: "Vasco da Gama",
-                        team2: "Fornelos A",
-                        field: "Campo Predimed",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 15,
-                        time: "15:15",
-                        team1: "Armil",
-                        team2: "Quinchães",
-                        field: "Campo Gsport",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 16,
-                        time: "15:15",
-                        team1: "Fornelos A",
-                        team2: "Marinhão",
-                        field: "Campo Farmácia Albarelos",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 17,
-                        time: "16:00",
-                        team1: "Quinchães",
-                        team2: "Fornelos B",
-                        field: "Campo Dudidi",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 18,
-                        time: "16:00",
-                        team1: "Vasco da Gama",
-                        team2: "Marinhão",
-                        field: "Campo Predimed",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                ],
-                finals: [
-                    { time: "16:45", match: "3º lugar Grupo I vs 3º lugar Grupo II", field: "Campo Predimed" },
-                    { time: "16:45", match: "2º lugar Grupo I vs 2º lugar Grupo II", field: "Campo Farmácia Albarelos" },
-                    { time: "17:30", match: "1º lugar Grupo I vs 1º lugar Grupo II", field: "Campo Dudidi" },
-                ],
-            },
-            benjamins: {
-                name: "Benjamins",
-                groups: {
-                    I: ["Armil", "Sousa", "Marinhão"],
-                    II: ["Fornelos", "Serafão", "Quinchães"],
-                },
-                manualStandings: {
-                    I: null,
-                    II: null
-                },
-                matches: [
-                    {
-                        id: 19,
-                        time: "14:30",
-                        team1: "Armil",
-                        team2: "Marinhão",
-                        field: "Campo Gsport",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 20,
-                        time: "14:30",
-                        team1: "Fornelos",
-                        team2: "Serafão",
-                        field: "Campo Farmácia Albarelos",
-                        jornada: 1,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 21,
-                        time: "15:15",
-                        team1: "Armil",
-                        team2: "Sousa",
-                        field: "Campo Dudidi",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 22,
-                        time: "15:15",
-                        team1: "Serafão",
-                        team2: "Quinchães",
-                        field: "Campo Predimed",
-                        jornada: 2,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 23,
-                        time: "16:00",
-                        team1: "Marinhão",
-                        team2: "Sousa",
-                        field: "Campo Farmácia Albarelos",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 24,
-                        time: "16:00",
-                        team1: "Fornelos",
-                        team2: "Quinchães",
-                        field: "Campo Gsport",
-                        jornada: 3,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                ],
-                finals: [
-                    { time: "16:45", match: "3º lugar Grupo I vs 3º lugar Grupo II", field: "Campo Gsport" },
-                    { time: "16:45", match: "2º lugar Grupo I vs 2º lugar Grupo II", field: "Campo Dudidi" },
-                    { time: "18:00", match: "1º lugar Grupo I vs 1º lugar Grupo II", field: "Campo Farmácia Albarelos" },
-                ],
-            },
+        // ============= Variáveis de Estado =============
+        let tournamentData = {
+            petizes: null,
+            traquinas: null,
+            benjamins: null
         };
-
-        let tournamentData = JSON.parse(JSON.stringify(initialTournamentData));
         let activeCategory = "petizes";
         let isAdminMode = false;
         let editingMatch = null;
         let editingStandings = null;
 
-        // Atualizar relógio
+        // ============= Atualizar Relógio =============
         function updateClock() {
             const now = new Date();
             document.getElementById('current-time').textContent = now.toLocaleTimeString('pt-PT');
@@ -892,16 +652,13 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Calcular classificações
+        // ============= Função para calcular classificações (igual ao seu original) =============
         function calculateStandings(category) {
             const data = tournamentData[category];
             const standings = { I: {}, II: {} };
 
-            // Se existem classificações manuais (e o objeto manualStandings existe), usar essas
-            if (
-                data.manualStandings &&
-                (data.manualStandings.I || data.manualStandings.II)
-            ) {
+            // Se existem classificações manuais, usar essas
+            if (data.manualStandings && (data.manualStandings.I || data.manualStandings.II)) {
                 if (data.manualStandings.I) {
                     standings.I = data.manualStandings.I;
                 }
@@ -909,11 +666,9 @@
                     standings.II = data.manualStandings.II;
                 }
 
-                // Para grupos sem classificação manual (ou se manualStandings for inexistente), calcular automaticamente
+                // Para grupos sem classificação manual, inicializar automaticamente
                 Object.entries(data.groups).forEach(([groupName, teams]) => {
-                    // Se o objeto manualStandings não existe, ou não há classificação manual para este grupo,
-                    // faço o cálculo “automático” (zerando pontos, jogos, etc.)
-                    if (!data.manualStandings || !data.manualStandings[groupName]) {
+                    if (!data.manualStandings[groupName]) {
                         teams.forEach((team) => {
                             standings[groupName][team] = {
                                 team,
@@ -928,64 +683,9 @@
                         });
                     }
                 });
-
-                // Agora preciso iterar sobre todos os jogos e somar resultados apenas para grupos sem classificação manual
-                Object.values(data.results).flat().forEach((match) => {
-                    const { team1, team2, goals1, goals2 } = match;
-                    // Descubro em qual grupo cada time está (se estiver em I ou II)
-                    const team1Group = Object.keys(data.groups).find((g) =>
-                        data.groups[g].includes(team1)
-                    );
-                    const team2Group = Object.keys(data.groups).find((g) =>
-                        data.groups[g].includes(team2)
-                    );
-
-                    // Só atualizo estatísticas se:
-                    //  1) Ambos os times pertençam ao mesmo grupo (I ou II), e
-                    //  2) Esse grupo NÃO tiver classificação manual
-                    if (
-                        team1Group &&
-                        team2Group &&
-                        team1Group === team2Group &&
-                        (!data.manualStandings || !data.manualStandings[team1Group])
-                    ) {
-                        // Atualizo jogos, gols, pontos etc. em standings[team1Group][team1], standings[team1Group][team2]
-                        const row1 = standings[team1Group][team1];
-                        const row2 = standings[team2Group][team2];
-
-                        // Jogos
-                        row1.played++;
-                        row2.played++;
-
-                        // Gols a favor/contra
-                        row1.gf += goals1;
-                        row1.ga += goals2;
-                        row2.gf += goals2;
-                        row2.ga += goals1;
-
-                        // Vitória, empate ou derrota
-                        if (goals1 > goals2) {
-                            row1.wins++;
-                            row1.points += 3;
-                            row2.losses++;
-                        } else if (goals1 < goals2) {
-                            row2.wins++;
-                            row2.points += 3;
-                            row1.losses++;
-                        } else {
-                            // empate
-                            row1.draws++;
-                            row2.draws++;
-                            row1.points++;
-                            row2.points++;
-                        }
-                    }
-                });
             } else {
-                // NÃO há manualStandings definidos para I nem para II:
-                // Inicializo todas as equipes de I e II “automaticamente” antes de contar resultados
+                // Inicializar todas as equipas para cálculo automático
                 Object.entries(data.groups).forEach(([groupName, teams]) => {
-                    standings[groupName] = {};
                     teams.forEach((team) => {
                         standings[groupName][team] = {
                             team,
@@ -999,54 +699,54 @@
                         };
                     });
                 });
+            }
 
-                // Agora somo resultados para ambos os grupos
-                Object.values(data.results).flat().forEach((match) => {
-                    const { team1, team2, goals1, goals2 } = match;
-                    const team1Group = Object.keys(data.groups).find((g) =>
-                        data.groups[g].includes(team1)
-                    );
-                    const team2Group = Object.keys(data.groups).find((g) =>
-                        data.groups[g].includes(team2)
-                    );
+            // Processar jogos terminados (apenas para grupos sem classificação manual)
+            data.matches.forEach((match) => {
+                if (match.status === "finished") {
+                    let team1Group = null;
+                    let team2Group = null;
 
-                    if (team1Group && team2Group && team1Group === team2Group) {
-                        const row1 = standings[team1Group][team1];
-                        const row2 = standings[team2Group][team2];
+                    Object.entries(data.groups).forEach(([groupName, teams]) => {
+                        if (teams.includes(match.team1)) team1Group = groupName;
+                        if (teams.includes(match.team2)) team2Group = groupName;
+                    });
 
-                        row1.played++;
-                        row2.played++;
-                        row1.gf += goals1;
-                        row1.ga += goals2;
-                        row2.gf += goals2;
-                        row2.ga += goals1;
+                    if (team1Group && team2Group && team1Group === team2Group && (!data.manualStandings || !data.manualStandings[team1Group])) {
+                        const group = team1Group;
+                        const team1Stats = standings[group][match.team1];
+                        const team2Stats = standings[group][match.team2];
 
-                        if (goals1 > goals2) {
-                            row1.wins++;
-                            row1.points += 3;
-                            row2.losses++;
-                        } else if (goals1 < goals2) {
-                            row2.wins++;
-                            row2.points += 3;
-                            row1.losses++;
+                        team1Stats.played++;
+                        team2Stats.played++;
+                        team1Stats.gf += match.score1;
+                        team1Stats.ga += match.score2;
+                        team2Stats.gf += match.score2;
+                        team2Stats.ga += match.score1;
+
+                        if (match.score1 > match.score2) {
+                            team1Stats.wins++;
+                            team1Stats.points += 3;
+                            team2Stats.losses++;
+                        } else if (match.score1 < match.score2) {
+                            team2Stats.wins++;
+                            team2Stats.points += 3;
+                            team1Stats.losses++;
                         } else {
-                            row1.draws++;
-                            row2.draws++;
-                            row1.points++;
-                            row2.points++;
+                            team1Stats.draws++;
+                            team2Stats.draws++;
+                            team1Stats.points += 1;
+                            team2Stats.points += 1;
                         }
                     }
-                });
-            }
+                }
+            });
 
             // Converter para arrays e ordenar (apenas grupos sem classificação manual)
             Object.keys(standings).forEach((group) => {
-                // Se não existir manualStandings OU manualStandings[group] for indefinido, ordeno por pontos e saldo
                 if (!data.manualStandings || !data.manualStandings[group]) {
                     standings[group] = Object.values(standings[group]).sort(
-                        (a, b) =>
-                            b.points - a.points ||
-                            (b.gf - b.ga) - (a.gf - a.ga)
+                        (a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga)
                     );
                 }
             });
@@ -1054,86 +754,29 @@
             return standings;
         }
 
-        // Atualizar jogo
-        async function updateMatch(matchId, updates) {
-            try {
-                // Encontrar a categoria e o jogo
-                let categoryKey = null;
-                let matchIndex = -1;
+        // ============= Funções que escrevem no Firebase =============
+        function updateMatch(matchId, updates) {
+            // Encontra em qual categoria está esse matchId e faz update no DB
+            ["petizes", "traquinas", "benjamins"].forEach(category => {
+                const catData = tournamentData[category];
+                if (!catData || !catData.matches) return;
 
-                Object.keys(tournamentData).forEach(category => {
-                    const index = tournamentData[category].matches.findIndex(m => m.id === matchId);
-                    if (index !== -1) {
-                        categoryKey = category;
-                        matchIndex = index;
+                catData.matches.forEach((m, idx) => {
+                    if (m.id === matchId) {
+                        // No Realtime DB, as matches estão como um array.
+                        // Precisamos usar o índice exato no nó: torneio/{category}/matches/{idx}
+                        db.ref(`torneio/${category}/matches/${idx}`).update(updates);
                     }
                 });
-
-                if (categoryKey && matchIndex !== -1) {
-                    // Atualizar localmente
-                    Object.assign(tournamentData[categoryKey].matches[matchIndex], updates);
-
-                    // Atualizar no Firebase
-                    const matchRef = window.firebaseRef(window.firebaseDatabase, `tournament/${categoryKey}/matches/${matchIndex}`);
-                    await window.firebaseUpdate(matchRef, updates);
-
-                    renderDashboard();
-                }
-            } catch (error) {
-                console.error("Erro ao atualizar jogo:", error);
-            }
+            });
         }
 
-        // Atualizar classificações
-        async function updateStandings(category, group, newStandings) {
-            try {
-                // Atualizar localmente
-                tournamentData[category].manualStandings[group] = newStandings;
-
-                // Atualizar no Firebase
-                const standingsRef = window.firebaseRef(window.firebaseDatabase, `tournament/${category}/manualStandings/${group}`);
-                await window.firebaseSet(standingsRef, newStandings);
-
-                renderDashboard();
-            } catch (error) {
-                console.error("Erro ao atualizar classificações:", error);
-            }
+        function updateStandings(category, group, newStandings) {
+            // Substitui todo o array manualStandings[group] no DB
+            db.ref(`torneio/${category}/manualStandings/${group}`).set(newStandings);
         }
 
-        // Carregar dados iniciais
-        async function loadInitialData() {
-            try {
-                const dataRef = window.firebaseRef(window.firebaseDatabase, 'tournament');
-                const snapshot = await window.firebaseGet(dataRef);
-
-                if (!snapshot.exists()) {
-                    // Se não existirem dados, usar os dados iniciais
-                    await window.firebaseSet(dataRef, initialTournamentData);
-                    console.log("Dados iniciais carregados no Firebase");
-                } else {
-                    // Carregar dados existentes
-                    tournamentData = snapshot.val();
-                    console.log("Dados carregados do Firebase");
-                }
-
-                // Escutar mudanças em tempo real
-                window.firebaseOnValue(dataRef, (snapshot) => {
-                    if (snapshot.exists()) {
-                        tournamentData = snapshot.val();
-                        renderDashboard();
-                    }
-                });
-
-                // Renderizar dashboard inicial
-                renderDashboard();
-            } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-                // Em caso de erro, usar dados locais
-                renderDashboard();
-            }
-        }
-
-        // Obter badge de status
+        // ============= Renderização do Dashboard (quase igual ao original, só que lendo de tournamentData que vem do Firebase) =============
         function getStatusBadge(status) {
             switch (status) {
                 case "live":
@@ -1154,10 +797,13 @@
             }
         }
 
-        // Renderizar dashboard
         function renderDashboard() {
-            // Renderizar conteúdo para cada categoria
-            Object.keys(tournamentData).forEach((category) => {
+            // Só renderiza quando já carregamos todos os dados (se algum for null, espera)
+            if (!tournamentData.petizes || !tournamentData.traquinas || !tournamentData.benjamins) {
+                return;
+            }
+
+            ["petizes", "traquinas", "benjamins"].forEach((category) => {
                 const data = tournamentData[category];
                 const standings = calculateStandings(category);
 
@@ -1196,8 +842,8 @@
                     `;
 
                     if (standings[groupName]) {
-                        const standingsArray = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
-                        standingsArray.forEach((team, index) => {
+                        const arr = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
+                        arr.forEach((team, index) => {
                             html += `
                                 <div class="standings-row">
                                     <span class="position">${index + 1}º</span>
@@ -1231,10 +877,10 @@
                             </h2>
                 `;
 
-                // Jornadas
+                // Jornadas (1, 2, 3)
                 [1, 2, 3].forEach((jornada) => {
                     const jornadaMatches = data.matches.filter((match) => match.jornada === jornada);
-                    if (jornadaMatches.length === 0) return;
+                    if (!jornadaMatches || jornadaMatches.length === 0) return;
 
                     html += `
                         <div class="standings-card">
@@ -1302,7 +948,7 @@
                             <div class="space-y-3">
                 `;
 
-                data.finals.forEach((final, index) => {
+                data.finals.forEach((final) => {
                     html += `
                         <div class="flex items-center justify-between p-3 border rounded-lg bg-yellow-50">
                             <div class="flex items-center gap-4">
@@ -1330,13 +976,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
                 `;
 
                 document.getElementById(category).innerHTML = html;
             });
 
-            // Atualizar jogos ao vivo
+            // Mostrar ou esconder “Jogos ao Vivo”
             const liveMatches = tournamentData[activeCategory].matches.filter(match => match.status === "live");
             const liveMatchesContainer = document.getElementById('live-matches-container');
             const liveMatchesList = document.getElementById('live-matches-list');
@@ -1382,16 +1027,16 @@
                 liveMatchesContainer.style.display = 'none';
             }
 
-            // Adicionar event listeners para botões de edição de jogos
+            // Estabelece event listeners para botões “Editar” após re-render
             document.querySelectorAll('.edit-match-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const matchId = parseInt(this.getAttribute('data-match-id'));
                     let match = null;
 
                     // Encontrar o jogo em todas as categorias
-                    Object.keys(tournamentData).forEach(category => {
-                        const foundMatch = tournamentData[category].matches.find(m => m.id === matchId);
-                        if (foundMatch) match = foundMatch;
+                    ["petizes", "traquinas", "benjamins"].forEach(category => {
+                        const arr = tournamentData[category].matches || [];
+                        arr.forEach(m => { if (m.id === matchId) match = m; });
                     });
 
                     if (match) {
@@ -1408,7 +1053,6 @@
                 });
             });
 
-            // Adicionar event listeners para botões de edição de classificações
             document.querySelectorAll('.edit-standings-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const category = this.getAttribute('data-category');
@@ -1446,21 +1090,15 @@
             });
         }
 
-        // Alternar entre tabs
+        // ============= Listeners para Tabs =============
         document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', function () {
                 const tab = this.getAttribute('data-tab');
 
-                // Atualizar botões
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
 
-                // Atualizar conteúdo
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 document.getElementById(tab).classList.add('active');
 
                 activeCategory = tab;
@@ -1468,7 +1106,8 @@
             });
         });
 
-        // Login de administrador
+        // ============= Modal e Botões de Login Admin (igual ao original) =============
+        const ADMIN_PASSWORD = "admin2024";
         document.getElementById('admin-login-btn').addEventListener('click', function () {
             document.getElementById('login-modal').classList.add('active');
             document.getElementById('password-input').value = '';
@@ -1494,7 +1133,6 @@
             }
         });
 
-        // Logout de administrador
         document.getElementById('admin-logout-btn').addEventListener('click', function () {
             isAdminMode = false;
             document.getElementById('admin-login-btn').style.display = 'inline-flex';
@@ -1503,7 +1141,6 @@
             renderDashboard();
         });
 
-        // Mostrar/ocultar password
         document.getElementById('password-toggle').addEventListener('click', function () {
             const passwordInput = document.getElementById('password-input');
             const eyeIcon = document.querySelector('.eye-icon');
@@ -1520,7 +1157,23 @@
             }
         });
 
-        // Editar jogo
+        document.getElementById('password-input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('login-btn').click();
+            }
+        });
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    editingMatch = null;
+                    editingStandings = null;
+                }
+            });
+        });
+
+        // ============= Editar Jogo e Guardar no Firebase =============
         document.getElementById('save-edit-btn').addEventListener('click', function () {
             if (editingMatch) {
                 const updates = {
@@ -1540,7 +1193,7 @@
             editingMatch = null;
         });
 
-        // Editar classificações
+        // ============= Editar Classificações e Guardar no Firebase =============
         document.getElementById('save-standings-btn').addEventListener('click', function () {
             if (editingStandings) {
                 const newStandings = [];
@@ -1552,8 +1205,8 @@
                     const played = parseInt(document.querySelector(`.standings-played[data-team="${team}"]`).value) || 0;
                     const wins = parseInt(document.querySelector(`.standings-wins[data-team="${team}"]`).value) || 0;
 
-                    // Calcular empates e derrotas
-                    const draws = Math.max(0, played - wins - Math.max(0, played - wins - Math.floor((points - wins * 3) / 1)));
+                    // Calcular empates e derrotas com base nos valores inseridos
+                    const draws = Math.max(0, played - wins - Math.max(0, played - wins - Math.floor((points - wins * 3))));
                     const losses = Math.max(0, played - wins - draws);
 
                     newStandings.push({
@@ -1563,12 +1216,14 @@
                         wins,
                         draws,
                         losses,
-                        gf: 0, // Pode ser editado se necessário
-                        ga: 0  // Pode ser editado se necessário
+                        gf: 0,
+                        ga: 0
                     });
                 });
 
-                // Ordenar por posição atual (manter ordem definida pelo admin)
+                // Ordenar por pontos decrescentes (caso queira manter ordem, comente a próxima linha)
+                newStandings.sort((a, b) => b.points - a.points);
+
                 updateStandings(editingStandings.category, editingStandings.group, newStandings);
                 document.getElementById('standings-modal').classList.remove('active');
                 editingStandings = null;
@@ -1580,27 +1235,26 @@
             editingStandings = null;
         });
 
-        // Pressionar Enter para login
-        document.getElementById('password-input').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                document.getElementById('login-btn').click();
-            }
-        });
-
-        // Fechar modais clicando fora
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function (e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                    editingMatch = null;
-                    editingStandings = null;
+        // ============= Listeners do Firebase para Carregar Dados Iniciais =============
+        function listenToCategory(category) {
+            const catRef = db.ref('torneio/' + category);
+            catRef.on('value', snapshot => {
+                const data = snapshot.val();
+                // Se não existe nada no DB, inicializa com estrutura mínima
+                if (data === null) {
+                    // Estrutura mínima esperada: { groups: {I: [...], II: [...]}, matches: [...], finals: [...], manualStandings: {I: null, II: null}, name: "..." }
+                    // Como a estrutura completa inicial seria igual ao initialTournamentData (e já foi removida), você pode criar manualmente aqui
+                    // Porém, assumiremos que você já subiu manualmente a árvore /torneio no Realtime Database ou usará o console do Firebase
+                    console.warn(`Nenhum dado encontrado para ${category}. Configure manualmente no console do Firebase.`);
+                    return;
                 }
+                tournamentData[category] = data;
+                renderDashboard();
             });
-        });
+        }
 
-        // Inicializar aplicação
-        loadInitialData();
+        // Fazer o listener para cada categoria
+        ['petizes', 'traquinas', 'benjamins'].forEach(cat => listenToCategory(cat));
     </script>
 </body>
-
 </html>

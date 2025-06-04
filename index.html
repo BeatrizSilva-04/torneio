@@ -4,18 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3º ARMIL CUP - Torneio de Futsal</title>
-        <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-        
-        // Make Firebase functions available globally
-        window.initializeApp = initializeApp;
-        window.getDatabase = getDatabase;
-        window.dbRef = ref;
-        window.dbSet = set;
-        window.dbGet = get;
-        window.dbOnValue = onValue;
-    </script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .animate-pulse {
@@ -498,24 +486,35 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjmAXfeufT4nUhz8QC8MSJBLroYzKQWRg",
+            authDomain: "armil-f539f.firebaseapp.com",
+            databaseURL: "https://armil-f539f-default-rtdb.firebaseio.com",
+            projectId: "armil-f539f",
+            storageBucket: "armil-f539f.firebasestorage.app",
+            messagingSenderId: "954636521330",
+            appId: "1:954636521330:web:7170da80b622aaf0be17eb",
+            measurementId: "G-4S06F7NJZ2"
+        };
 
-// Adicionar no início do seu script
-const firebaseConfig = {
-    // Suas credenciais do Firebase aqui
-    apiKey: "AIzaSyBjmAXfeufT4nUhz8QC8MSJBLroYzKQWRg",
-  authDomain: "armil-f539f.firebaseapp.com",
-  databaseURL: "https://armil-f539f-default-rtdb.firebaseio.com",
-  projectId: "armil-f539f",
-  storageBucket: "armil-f539f.firebasestorage.app",
-  messagingSenderId: "954636521330",
-  appId: "1:954636521330:web:7170da80b622aaf0be17eb",
-  measurementId: "G-4S06F7NJZ2"
-};
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+        // Tornar as funções disponíveis globalmente
+        window.firebaseApp = app;
+        window.firebaseDatabase = database;
+        window.firebaseRef = ref;
+        window.firebaseSet = set;
+        window.firebaseGet = get;
+        window.firebaseOnValue = onValue;
+        window.firebaseUpdate = update;
 
         // Password do administrador
         const ADMIN_PASSWORD = "admin2024";
@@ -528,9 +527,8 @@ const database = getDatabase(app);
                     I: ["Armil", "Sousa", "Marinhão", "Fornelos B"],
                     II: ["Ases", "Celorico", "Quinchães", "Fornelos A"],
                 },
-                // Classificações manuais (sobrepõem o cálculo automático se definidas)
                 manualStandings: {
-                    I: null, // null = usar cálculo automático
+                    I: null,
                     II: null
                 },
                 matches: [
@@ -963,49 +961,84 @@ const database = getDatabase(app);
             return standings;
         }
 
+        // Atualizar jogo
+        async function updateMatch(matchId, updates) {
+            try {
+                // Encontrar a categoria e o jogo
+                let categoryKey = null;
+                let matchIndex = -1;
+                
+                Object.keys(tournamentData).forEach(category => {
+                    const index = tournamentData[category].matches.findIndex(m => m.id === matchId);
+                    if (index !== -1) {
+                        categoryKey = category;
+                        matchIndex = index;
+                    }
+                });
 
-       // Atualizar jogo
-async function updateMatch(matchId, updates) {
-    try {
-        const matchRef = ref(database, `matches/${matchId}`);
-        await set(matchRef, updates);
-        renderDashboard();
-    } catch (error) {
-        console.error("Erro ao atualizar jogo:", error);
-    }
-}
-
-// Atualizar classificações
-async function updateStandings(category, group, newStandings) {
-    try {
-        const standingsRef = ref(database, `standings/${category}/${group}`);
-        await set(standingsRef, newStandings);
-        renderDashboard();
-    } catch (error) {
-        console.error("Erro ao atualizar classificações:", error);
-    }
-}
-
-// Carregar dados iniciais
-async function loadInitialData() {
-    try {
-        const dataRef = ref(database);
-        const snapshot = await get(dataRef);
-        
-        if (!snapshot.exists()) {
-            // Se não existirem dados, usar os dados iniciais
-            await set(ref(database), initialTournamentData);
+                if (categoryKey && matchIndex !== -1) {
+                    // Atualizar localmente
+                    Object.assign(tournamentData[categoryKey].matches[matchIndex], updates);
+                    
+                    // Atualizar no Firebase
+                    const matchRef = window.firebaseRef(window.firebaseDatabase, `tournament/${categoryKey}/matches/${matchIndex}`);
+                    await window.firebaseUpdate(matchRef, updates);
+                    
+                    renderDashboard();
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar jogo:", error);
+            }
         }
-        
-        // Escutar mudanças
-        onValue(dataRef, (snapshot) => {
-            tournamentData = snapshot.val();
-            renderDashboard();
-        });
-    } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-    }
-}
+
+        // Atualizar classificações
+        async function updateStandings(category, group, newStandings) {
+            try {
+                // Atualizar localmente
+                tournamentData[category].manualStandings[group] = newStandings;
+                
+                // Atualizar no Firebase
+                const standingsRef = window.firebaseRef(window.firebaseDatabase, `tournament/${category}/manualStandings/${group}`);
+                await window.firebaseSet(standingsRef, newStandings);
+                
+                renderDashboard();
+            } catch (error) {
+                console.error("Erro ao atualizar classificações:", error);
+            }
+        }
+
+        // Carregar dados iniciais
+        async function loadInitialData() {
+            try {
+                const dataRef = window.firebaseRef(window.firebaseDatabase, 'tournament');
+                const snapshot = await window.firebaseGet(dataRef);
+                
+                if (!snapshot.exists()) {
+                    // Se não existirem dados, usar os dados iniciais
+                    await window.firebaseSet(dataRef, initialTournamentData);
+                    console.log("Dados iniciais carregados no Firebase");
+                } else {
+                    // Carregar dados existentes
+                    tournamentData = snapshot.val();
+                    console.log("Dados carregados do Firebase");
+                }
+                
+                // Escutar mudanças em tempo real
+                window.firebaseOnValue(dataRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        tournamentData = snapshot.val();
+                        renderDashboard();
+                    }
+                });
+                
+                // Renderizar dashboard inicial
+                renderDashboard();
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+                // Em caso de erro, usar dados locais
+                renderDashboard();
+            }
+        }
 
         // Obter badge de status
         function getStatusBadge(status) {
@@ -1472,14 +1505,8 @@ async function loadInitialData() {
             });
         });
 
-        // Inicializar dashboard
-        renderDashboard();
+        // Inicializar aplicação
+        loadInitialData();
     </script>
-
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js"></script>
-
 </body>
 </html>
-
-

@@ -523,8 +523,9 @@
         <div class="text-center mb-8">
             <!-- Tournament Title Card -->
             <div class="tournament-title">
-                <div class="edition-number">3ª EDIÇÃO ARMIL CUP</div>
+                <div class="edition-number">3º</div>
                 <div class="date-text">7 de junho</div>
+                <div class="main-title">ARMIL CUP</div>
                 <div class="venue-text">Campo do Armil</div>
                 <div class="categories-text">Petizes, Traquinas e Benjamins</div>
             </div>
@@ -776,7 +777,7 @@
         let editingMatch = null;
         let editingStandings = null;
 
-        // ============= Dados Iniciais (fallback se Firebase estiver vazio) =============
+        // ============= Dados Iniciais Atualizados =============
         const initialTournamentData = {
             petizes: {
                 name: "Petizes",
@@ -935,19 +936,18 @@
             traquinas: {
                 name: "Traquinas",
                 groups: {
-                    I: ["Armil", "Fornelos B", "Quinchães"],
-                    II: ["Fornelos A", "Vasco da Gama", "Marinhão"],
+                    I: ["Armil", "Fornelos B", "Marinhão", "Fornelos A", "Quinchães"],
                 },
                 manualStandings: {
                     I: null,
-                    II: null
                 },
                 matches: [
+                    // Jornada 1
                     {
                         id: 13,
-                        time: "14:30",
-                        team1: "Armil",
-                        team2: "Fornelos B",
+                        time: "14h30",
+                        team1: "Quinchães",
+                        team2: "Armil",
                         field: "Campo Dudidi",
                         jornada: 1,
                         status: "upcoming",
@@ -956,20 +956,21 @@
                     },
                     {
                         id: 14,
-                        time: "14:30",
-                        team1: "Vasco da Gama",
-                        team2: "Fornelos A",
+                        time: "14h30",
+                        team1: "Marinhão",
+                        team2: "Fornelos B",
                         field: "Campo Predimed",
                         jornada: 1,
                         status: "upcoming",
                         score1: 0,
                         score2: 0,
                     },
+                    // Jornada 2
                     {
                         id: 15,
-                        time: "15:15",
+                        time: "15h15",
                         team1: "Armil",
-                        team2: "Quinchães",
+                        team2: "Marinhão",
                         field: "Campo Gsport",
                         jornada: 2,
                         status: "upcoming",
@@ -978,20 +979,21 @@
                     },
                     {
                         id: 16,
-                        time: "15:15",
+                        time: "15h15",
                         team1: "Fornelos A",
-                        team2: "Marinhão",
+                        team2: "Fornelos B",
                         field: "Campo Farmácia Albarelos",
                         jornada: 2,
                         status: "upcoming",
                         score1: 0,
                         score2: 0,
                     },
+                    // Jornada 3
                     {
                         id: 17,
-                        time: "16:00",
-                        team1: "Quinchães",
-                        team2: "Fornelos B",
+                        time: "16h",
+                        team1: "Fornelos A",
+                        team2: "Armil",
                         field: "Campo Dudidi",
                         jornada: 3,
                         status: "upcoming",
@@ -1000,8 +1002,8 @@
                     },
                     {
                         id: 18,
-                        time: "16:00",
-                        team1: "Vasco da Gama",
+                        time: "16h",
+                        team1: "Quinchães",
                         team2: "Marinhão",
                         field: "Campo Predimed",
                         jornada: 3,
@@ -1009,28 +1011,71 @@
                         score1: 0,
                         score2: 0,
                     },
+                    // Jornada 4
+                    {
+                        id: 19,
+                        time: "17h15",
+                        team1: "Fornelos B",
+                        team2: "Armil",
+                        field: "Campo Gsport",
+                        jornada: 4,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
+                    {
+                        id: 20,
+                        time: "17h15",
+                        team1: "Quinchães",
+                        team2: "Fornelos A",
+                        field: "Campo Farmácia Albarelos",
+                        jornada: 4,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
+                    // Jornada 5
+                    {
+                        id: 21,
+                        time: "18h",
+                        team1: "Fornelos B",
+                        team2: "Quinchães",
+                        field: "Campo Dudidi",
+                        jornada: 5,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
+                    {
+                        id: 22,
+                        time: "18h",
+                        team1: "Marinhão",
+                        team2: "Fornelos A",
+                        field: "Campo Predimed",
+                        jornada: 5,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
                 ],
                 finals: [
-                    { time: "16:45", match: "3º lugar Grupo I vs 3º lugar Grupo II", field: "Campo Predimed" },
-                    { time: "16:45", match: "2º lugar Grupo I vs 2º lugar Grupo II", field: "Campo Farmácia Albarelos" },
-                    { time: "17:30", match: "1º lugar Grupo I vs 1º lugar Grupo II", field: "Campo Dudidi" },
+                    { time: "18h45-19h", match: "Entrega de Prémios", field: "" },
                 ],
             },
             benjamins: {
                 name: "Benjamins",
                 groups: {
-                    I: ["Armil", "Sousa", "Marinhão"],
-                    II: ["Fornelos", "Serafão", "Quinchães"],
+                    I: ["Armil", "Sousa", "Fornelos", "Quinchães", "Marinhão"],
                 },
                 manualStandings: {
                     I: null,
-                    II: null
                 },
                 matches: [
+                    // Jornada 1
                     {
-                        id: 19,
-                        time: "14:30",
-                        team1: "Armil",
+                        id: 23,
+                        time: "14h30",
+                        team1: "Fornelos",
                         team2: "Marinhão",
                         field: "Campo Gsport",
                         jornada: 1,
@@ -1039,20 +1084,21 @@
                         score2: 0,
                     },
                     {
-                        id: 20,
-                        time: "14:30",
-                        team1: "Fornelos",
-                        team2: "Serafão",
+                        id: 24,
+                        time: "14h30",
+                        team1: "Sousa",
+                        team2: "Armil",
                         field: "Campo Farmácia Albarelos",
                         jornada: 1,
                         status: "upcoming",
                         score1: 0,
                         score2: 0,
                     },
+                    // Jornada 2
                     {
-                        id: 21,
-                        time: "15:15",
-                        team1: "Armil",
+                        id: 25,
+                        time: "15h15",
+                        team1: "Marinhão",
                         team2: "Sousa",
                         field: "Campo Dudidi",
                         jornada: 2,
@@ -1061,9 +1107,9 @@
                         score2: 0,
                     },
                     {
-                        id: 22,
-                        time: "15:15",
-                        team1: "Serafão",
+                        id: 26,
+                        time: "15h15",
+                        team1: "Armil",
                         team2: "Quinchães",
                         field: "Campo Predimed",
                         jornada: 2,
@@ -1071,11 +1117,12 @@
                         score1: 0,
                         score2: 0,
                     },
+                    // Jornada 3
                     {
-                        id: 23,
-                        time: "16:00",
-                        team1: "Marinhão",
-                        team2: "Sousa",
+                        id: 27,
+                        time: "16h",
+                        team1: "Quinchães",
+                        team2: "Marinhão",
                         field: "Campo Farmácia Albarelos",
                         jornada: 3,
                         status: "upcoming",
@@ -1083,21 +1130,65 @@
                         score2: 0,
                     },
                     {
-                        id: 24,
-                        time: "16:00",
-                        team1: "Fornelos",
-                        team2: "Quinchães",
+                        id: 28,
+                        time: "16h",
+                        team1: "Sousa",
+                        team2: "Fornelos",
                         field: "Campo Gsport",
                         jornada: 3,
                         status: "upcoming",
                         score1: 0,
                         score2: 0,
                     },
+                    // Jornada 4
+                    {
+                        id: 29,
+                        time: "17h15",
+                        team1: "Armil",
+                        team2: "Marinhão",
+                        field: "Campo Dudidi",
+                        jornada: 4,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
+                    {
+                        id: 30,
+                        time: "17h15",
+                        team1: "Quinchães",
+                        team2: "Fornelos",
+                        field: "Campo Predimed",
+                        jornada: 4,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
+                    // Jornada 5
+                    {
+                        id: 31,
+                        time: "18h",
+                        team1: "Armil",
+                        team2: "Fornelos",
+                        field: "Campo Farmácia Albarelos",
+                        jornada: 5,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
+                    {
+                        id: 32,
+                        time: "18h",
+                        team1: "Quinchães",
+                        team2: "Sousa",
+                        field: "Campo Gsport",
+                        jornada: 5,
+                        status: "upcoming",
+                        score1: 0,
+                        score2: 0,
+                    },
                 ],
                 finals: [
-                    { time: "16:45", match: "3º lugar Grupo I vs 3º lugar Grupo II", field: "Campo Gsport" },
-                    { time: "16:45", match: "2º lugar Grupo I vs 2º lugar Grupo II", field: "Campo Dudidi" },
-                    { time: "18:00", match: "1º lugar Grupo I vs 1º lugar Grupo II", field: "Campo Farmácia Albarelos" },
+                    { time: "18h45-19h", match: "Entrega de Prémios", field: "" },
                 ],
             },
         };
@@ -1113,36 +1204,13 @@
         // ============= Função para calcular classificações =============
         function calculateStandings(category) {
             const data = tournamentData[category];
-            if (!data) return { I: {}, II: {} };
+            if (!data) return { I: {} };
             
-            const standings = { I: {}, II: {} };
+            const standings = { I: {} };
 
             // Se existem classificações manuais, usar essas
-            if (data.manualStandings && (data.manualStandings.I || data.manualStandings.II)) {
-                if (data.manualStandings.I) {
-                    standings.I = data.manualStandings.I;
-                }
-                if (data.manualStandings.II) {
-                    standings.II = data.manualStandings.II;
-                }
-
-                // Para grupos sem classificação manual, inicializar automaticamente
-                Object.entries(data.groups).forEach(([groupName, teams]) => {
-                    if (!data.manualStandings[groupName]) {
-                        teams.forEach((team) => {
-                            standings[groupName][team] = {
-                                team,
-                                points: 0,
-                                played: 0,
-                                wins: 0,
-                                draws: 0,
-                                losses: 0,
-                                gf: 0,
-                                ga: 0,
-                            };
-                        });
-                    }
-                });
+            if (data.manualStandings && data.manualStandings.I) {
+                standings.I = data.manualStandings.I;
             } else {
                 // Inicializar todas as equipas para cálculo automático
                 Object.entries(data.groups).forEach(([groupName, teams]) => {
@@ -1330,10 +1398,12 @@
                             </h2>
                 `;
 
-                // Jornadas (1, 2, 3)
-                [1, 2, 3].forEach((jornada) => {
+                // Determinar número de jornadas baseado na categoria
+                const maxJornadas = category === "petizes" ? 3 : 5;
+                
+                for (let jornada = 1; jornada <= maxJornadas; jornada++) {
                     const jornadaMatches = data.matches.filter((match) => match.jornada === jornada);
-                    if (!jornadaMatches || jornadaMatches.length === 0) return;
+                    if (!jornadaMatches || jornadaMatches.length === 0) continue;
 
                     html += `
                         <div class="standings-card">
@@ -1380,10 +1450,24 @@
 
                     html += `
                                 </div>
+                    `;
+
+                    // Adicionar intervalo para lanche após jornada 3 (apenas para Traquinas e Benjamins)
+                    if (jornada === 3 && category !== "petizes") {
+                        html += `
+                            <div class="mt-4 p-3 bg-blue-50 rounded-lg text-center">
+                                <p class="text-sm text-blue-700 font-medium">
+                                    ⏰ Intervalo de 30 min para lanche
+                                </p>
+                            </div>
+                        `;
+                    }
+
+                    html += `
                             </div>
                         </div>
                     `;
-                });
+                }
 
                 html += `
                     <div class="standings-card">
@@ -1397,7 +1481,7 @@
                                     <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
                                     <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
                                 </svg>
-                                Finais
+                                ${category === "petizes" ? "Finais" : "Entrega de Prémios"}
                             </h3>
                         </div>
                         <div class="standings-content p-6">
@@ -1405,39 +1489,45 @@
                 `;
 
                 data.finals.forEach((final) => {
-                    html += `
-                        <div class="match-card bg-yellow-50 border-yellow-200">
-                            <div class="match-header">
-                                <div class="match-teams text-sm sm:text-base">${final.match}</div>
-                            </div>
-                            <div class="match-info">
-                                <div class="match-time-field">
-                                    <span class="match-time">${final.time}</span>
-                                    <div class="match-field">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
-                                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                            <circle cx="12" cy="10" r="3"></circle>
-                                        </svg>
-                                        <span>${final.field}</span>
+                    if (category === "petizes") {
+                        html += `
+                            <div class="match-card bg-yellow-50 border-yellow-200">
+                                <div class="match-header">
+                                    <div class="match-teams text-sm sm:text-base">${final.match}</div>
+                                </div>
+                                <div class="match-info">
+                                    <div class="match-time-field">
+                                        <span class="match-time">${final.time}</span>
+                                        <div class="match-field">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                                <circle cx="12" cy="10" r="3"></circle>
+                                            </svg>
+                                            <span>${final.field}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        html += `
+                            <div class="match-card bg-yellow-50 border-yellow-200">
+                                <div class="match-header">
+                                    <div class="match-teams text-center">
+                                        🏆 ${final.match}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
                 });
 
                 html += `
                             </div>
-                            <div class="mt-4 p-3 bg-blue-50 rounded-lg text-center">
-                                <p class="text-sm text-blue-700 font-medium">
-                                    🏆 Entrega de Prémios: ${category === "petizes" ? "11h45-12h" : "18h45-19h"}
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
                 `;
 
                 document.getElementById(category).innerHTML = html;

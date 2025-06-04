@@ -4,50 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3º ARMIL CUP - Torneio de Futsal</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBjmAXfeufT4nUhz8QC8MSJBLroYzKQWRg",
-            authDomain: "armil-f539f.firebaseapp.com",
-            databaseURL: "https://armil-f539f-default-rtdb.firebaseio.com",
-            projectId: "armil-f539f",
-            storageBucket: "armil-f539f.firebasestorage.app",
-            messagingSenderId: "954636521330",
-            appId: "1:954636521330:web:7170da80b622aaf0be17eb",
-            measurementId: "G-4S06F7NJZ2"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        
-        window.initializeApp = initializeApp;
-        window.getDatabase = getDatabase;
-        window.dbRef = ref;
-        window.dbSet = set;
-        window.dbGet = get;
-        window.dbOnValue = onValue;
-    </script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tournament-title {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #1e40af 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tournament-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .edition-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fbbf24;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .date-text {
+            font-size: 0.875rem;
+            color: #e0f2fe;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.05em;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .venue-text {
+            font-size: 1rem;
+            color: #e0f2fe;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .categories-text {
+            font-size: 0.875rem;
+            color: #bae6fd;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .edition-number {
+                font-size: 2rem;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .venue-text {
+                font-size: 0.875rem;
+            }
+        }
+
         .animate-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         .tab-button {
             padding: 0.75rem 1rem;
             border-radius: 0.5rem;
@@ -60,12 +126,12 @@
             justify-content: center;
             gap: 0.5rem;
         }
-        
+
         .tab-button.active {
             background-color: #3b82f6;
             color: white;
         }
-        
+
         .badge {
             display: inline-flex;
             align-items: center;
@@ -74,22 +140,22 @@
             font-size: 0.75rem;
             font-weight: 500;
         }
-        
+
         .badge-outline {
             border: 1px solid #d1d5db;
             color: #4b5563;
         }
-        
+
         .badge-secondary {
             background-color: #e5e7eb;
             color: #4b5563;
         }
-        
+
         .badge-destructive {
             background-color: #ef4444;
             color: white;
         }
-        
+
         .modal {
             display: none;
             position: fixed;
@@ -103,11 +169,11 @@
             justify-content: center;
             padding: 1rem;
         }
-        
+
         .modal.active {
             display: flex;
         }
-        
+
         .modal-content {
             background-color: white;
             border-radius: 0.5rem;
@@ -118,7 +184,7 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -131,40 +197,40 @@
             border: none;
             text-decoration: none;
         }
-        
+
         .btn-primary {
             background-color: #3b82f6;
             color: white;
         }
-        
+
         .btn-primary:hover {
             background-color: #2563eb;
         }
-        
+
         .btn-outline {
             border: 1px solid #d1d5db;
             color: #4b5563;
             background-color: white;
         }
-        
+
         .btn-outline:hover {
             background-color: #f3f4f6;
         }
-        
+
         .btn-destructive {
             background-color: #ef4444;
             color: white;
         }
-        
+
         .btn-destructive:hover {
             background-color: #dc2626;
         }
-        
+
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
         }
-        
+
         .standings-card {
             background-color: white;
             border-radius: 0.75rem;
@@ -172,23 +238,23 @@
             overflow: hidden;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
-        
+
         .standings-header {
             padding: 1rem 1.5rem;
             border-bottom: 1px solid #f3f4f6;
         }
-        
+
         .standings-title {
             font-size: 1.25rem;
             font-weight: 600;
             color: #111827;
             margin: 0;
         }
-        
+
         .standings-content {
             padding: 0;
         }
-        
+
         .standings-table-header {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr 1fr;
@@ -201,7 +267,7 @@
             border-bottom: 1px solid #f3f4f6;
             text-align: center;
         }
-        
+
         .standings-row {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr 1fr;
@@ -211,53 +277,53 @@
             transition: background-color 0.2s;
             align-items: center;
         }
-        
+
         .standings-row:hover {
             background-color: #f9fafb;
         }
-        
+
         .standings-row:last-child {
             border-bottom: none;
         }
-        
+
         .position {
             font-weight: 600;
             color: #374151;
             text-align: center;
         }
-        
+
         .team-name {
             font-weight: 500;
             color: #111827;
             text-align: left;
             padding-left: 0.5rem;
         }
-        
+
         .points {
             font-weight: 600;
             color: #059669;
             font-size: 1.125rem;
             text-align: center;
         }
-        
+
         .games {
             color: #6b7280;
             text-align: center;
         }
-        
+
         .input {
             width: 100%;
             padding: 0.5rem;
             border-radius: 0.375rem;
             border: 1px solid #d1d5db;
         }
-        
+
         .input:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
         }
-        
+
         .select {
             width: 100%;
             padding: 0.5rem;
@@ -265,23 +331,23 @@
             border: 1px solid #d1d5db;
             background-color: white;
         }
-        
+
         .alert {
             padding: 0.75rem 1rem;
             border-radius: 0.375rem;
             margin-bottom: 1rem;
         }
-        
+
         .alert-destructive {
             background-color: #fee2e2;
             color: #b91c1c;
             border: 1px solid #fecaca;
         }
-        
+
         .password-input-wrapper {
             position: relative;
         }
-        
+
         .password-toggle {
             position: absolute;
             right: 0.5rem;
@@ -298,7 +364,6 @@
             font-size: 0.875rem;
         }
 
-        /* Melhorias para mobile */
         .match-card {
             display: flex;
             flex-direction: column;
@@ -374,7 +439,6 @@
             flex-wrap: wrap;
         }
 
-        /* Responsividade melhorada */
         @media (max-width: 640px) {
             .standings-table-header,
             .standings-row {
@@ -452,103 +516,57 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-2 sm:p-4">
+
+<body class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="relative mb-6 sm:mb-8 overflow-hidden">
-            <!-- Background com gradiente -->
-            <div class="relative bg-gradient-to-br from-blue-400 via-blue-500 to-blue-700 rounded-2xl p-6 sm:p-8 text-white shadow-2xl">
-                <!-- Padrão decorativo de fundo -->
-                <div class="absolute inset-0 opacity-10">
-                    <div class="absolute top-4 left-4 w-20 h-20 border-2 border-white rounded-full"></div>
-                    <div class="absolute top-8 right-8 w-16 h-16 border-2 border-white rounded-full"></div>
-                    <div class="absolute bottom-6 left-1/4 w-12 h-12 border-2 border-white rounded-full"></div>
-                    <div class="absolute bottom-4 right-1/3 w-8 h-8 border-2 border-white rounded-full"></div>
+        <div class="text-center mb-8">
+            <!-- Tournament Title Card -->
+            <div class="tournament-title">
+                <div class="edition-number">3º</div>
+                <div class="date-text">7 de junho</div>
+                <div class="main-title">ARMIL CUP</div>
+                <div class="venue-text">Campo do Armil</div>
+                <div class="categories-text">Petizes, Traquinas e Benjamins</div>
+            </div>
+
+            <div class="flex items-center justify-center gap-4">
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="current-time"></span>
                 </div>
-                
-                <!-- Conteúdo principal -->
-                <div class="relative z-10 text-center">
-                    <!-- Título principal -->
-                    <div class="mb-3">
-                        <h1 class="text-2xl sm:text-4xl font-black tracking-wider drop-shadow-lg text-yellow-300">
-                            3ª Edição Armil Cup
-                        </h1>
-                    </div>
-                    
-                    <!-- Data -->
-                    <div class="mb-4">
-                        <span class="text-lg sm:text-xl font-medium opacity-90">
-                            7 de junho de 2025
-                        </span>
-                    </div>
-                    
-                    <!-- Subtítulo -->
-                    <div class="mb-4">
-                        <p class="text-lg sm:text-xl font-semibold opacity-90">
-                            Campo do Armil
-                        </p>
-                    </div>
-                    
-                    <!-- Categorias -->
-                    <div class="mb-6">
-                        <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
-                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm sm:text-base font-medium">
-                                ⚽ Petizes
-                            </span>
-                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm sm:text-base font-medium">
-                                ⚽ Traquinas
-                            </span>
-                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm sm:text-base font-medium">
-                                ⚽ Benjamins
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Controles -->
-                    <div class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
-                        <div class="flex items-center gap-2 text-sm bg-white/20 backdrop-blur-sm px-3 py-2 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            <span id="current-time"></span>
-                        </div>
-                        <button id="admin-login-btn" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-200 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
-                            Admin
-                        </button>
-                        <button id="admin-logout-btn" class="bg-red-500/80 backdrop-blur-sm hover:bg-red-600/80 transition-all duration-200 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2" style="display: none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                <polyline points="16 17 21 12 16 7"></polyline>
-                                <line x1="21" y1="12" x2="9" y2="12"></line>
-                            </svg>
-                            Sair Admin
-                        </button>
-                    </div>
-                    
-                    <!-- Badge de admin -->
-                    <div class="mt-4" id="admin-badge" style="display: none;">
-                        <span class="inline-flex items-center bg-red-500/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium animate-pulse">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-2">
-                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <button id="admin-login-btn" class="btn btn-outline btn-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Admin
+                </button>
+                <button id="admin-logout-btn" class="btn btn-destructive btn-sm flex items-center gap-2" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sair Admin
+                </button>
+            </div>
+            <div class="mt-2" id="admin-badge" style="display: none;">
+                <span class="badge badge-destructive animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                     MODO ADMINISTRADOR ATIVO
                 </span>
             </div>
         </div>
-        
-        <!-- Efeito de brilho -->
-        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full animate-pulse"></div>
-    </div>
-</div>
 
         <!-- Live Matches Alert -->
-        <div id="live-matches-container" class="mb-4 sm:mb-6" style="display: none;">
+        <div id="live-matches-container" class="mb-6" style="display: none;">
             <div class="standings-card border-red-200 bg-red-50">
                 <div class="standings-header pb-3">
                     <h3 class="standings-title text-red-700 flex items-center gap-2">
@@ -558,7 +576,7 @@
                         <span id="live-matches-title">Jogos ao Vivo</span>
                     </h3>
                 </div>
-                <div class="standings-content p-4 sm:p-6">
+                <div class="standings-content p-6">
                     <div class="grid gap-3" id="live-matches-list">
                         <!-- Live matches will be inserted here -->
                     </div>
@@ -568,45 +586,51 @@
 
         <!-- Category Tabs -->
         <div class="w-full">
-            <div class="grid w-full grid-cols-3 mb-4 sm:mb-6 bg-gray-100 rounded-lg p-1">
+            <div class="grid w-full grid-cols-3 mb-6 bg-gray-100 rounded-lg p-1">
                 <button class="tab-button active" data-tab="petizes">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span class="hidden sm:inline">Petizes</span>
+                    <div class="flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Petizes
+                    </div>
                 </button>
                 <button class="tab-button" data-tab="traquinas">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span class="hidden sm:inline">Traquinas</span>
+                    <div class="flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Traquinas
+                    </div>
                 </button>
                 <button class="tab-button" data-tab="benjamins">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span class="hidden sm:inline">Benjamins</span>
+                    <div class="flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Benjamins
+                    </div>
                 </button>
             </div>
 
             <!-- Tab Contents -->
-            <div id="petizes" class="tab-content active space-y-4 sm:space-y-6">
-                <!-- Content will be inserted here -->
+            <div id="petizes" class="tab-content active space-y-6">
+                <!-- Conteúdo será preenchido dinamicamente -->
             </div>
-            <div id="traquinas" class="tab-content space-y-4 sm:space-y-6">
-                <!-- Content will be inserted here -->
+            <div id="traquinas" class="tab-content space-y-6">
+                <!-- Conteúdo será preenchido dinamicamente -->
             </div>
-            <div id="benjamins" class="tab-content space-y-4 sm:space-y-6">
-                <!-- Content will be inserted here -->
+            <div id="benjamins" class="tab-content space-y-6">
+                <!-- Conteúdo será preenchido dinamicamente -->
             </div>
         </div>
 
@@ -709,7 +733,7 @@
                 </div>
                 <div class="space-y-4">
                     <div id="standings-edit-list">
-                        <!-- Standings edit fields will be inserted here -->
+                        <!-- Standings edit fields serão inseridos aqui -->
                     </div>
 
                     <div class="flex gap-2">
@@ -726,10 +750,34 @@
     </div>
 
     <script>
-        // Password do administrador
-        const ADMIN_PASSWORD = "admin2024";
+        // ============= Firebase Initialization =============
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjmAXfeufT4nUhz8QC8MSJBLroYzKQWRg",
+            authDomain: "armil-f539f.firebaseapp.com",
+            databaseURL: "https://armil-f539f-default-rtdb.firebaseio.com",
+            projectId: "armil-f539f",
+            storageBucket: "armil-f539f.firebasestorage.app",
+            messagingSenderId: "954636521330",
+            appId: "1:954636521330:web:7170da80b622aaf0be17eb",
+            measurementId: "G-4S06F7NJZ2"
+        };
 
-        // Dados iniciais do torneio
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ============= Variáveis de Estado =============
+        let tournamentData = {
+            petizes: null,
+            traquinas: null,
+            benjamins: null
+        };
+        let activeCategory = "petizes";
+        let isAdminMode = false;
+        let editingMatch = null;
+        let editingStandings = null;
+
+        // ============= Dados Iniciais (fallback se Firebase estiver vazio) =============
         const initialTournamentData = {
             petizes: {
                 name: "Petizes",
@@ -1055,13 +1103,7 @@
             },
         };
 
-        let tournamentData = JSON.parse(JSON.stringify(initialTournamentData));
-        let activeCategory = "petizes";
-        let isAdminMode = false;
-        let editingMatch = null;
-        let editingStandings = null;
-
-        // Atualizar relógio
+        // ============= Atualizar Relógio =============
         function updateClock() {
             const now = new Date();
             document.getElementById('current-time').textContent = now.toLocaleTimeString('pt-PT');
@@ -1069,19 +1111,23 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Calcular classificações
+        // ============= Função para calcular classificações =============
         function calculateStandings(category) {
             const data = tournamentData[category];
+            if (!data) return { I: {}, II: {} };
+            
             const standings = { I: {}, II: {} };
 
-            if (data.manualStandings.I || data.manualStandings.II) {
+            // Se existem classificações manuais, usar essas
+            if (data.manualStandings && (data.manualStandings.I || data.manualStandings.II)) {
                 if (data.manualStandings.I) {
                     standings.I = data.manualStandings.I;
                 }
                 if (data.manualStandings.II) {
                     standings.II = data.manualStandings.II;
                 }
-                
+
+                // Para grupos sem classificação manual, inicializar automaticamente
                 Object.entries(data.groups).forEach(([groupName, teams]) => {
                     if (!data.manualStandings[groupName]) {
                         teams.forEach((team) => {
@@ -1099,6 +1145,7 @@
                     }
                 });
             } else {
+                // Inicializar todas as equipas para cálculo automático
                 Object.entries(data.groups).forEach(([groupName, teams]) => {
                     teams.forEach((team) => {
                         standings[groupName][team] = {
@@ -1125,7 +1172,7 @@
                         if (teams.includes(match.team2)) team2Group = groupName;
                     });
 
-                    if (team1Group && team2Group && team1Group === team2Group && !data.manualStandings[team1Group]) {
+                    if (team1Group && team2Group && team1Group === team2Group && (!data.manualStandings || !data.manualStandings[team1Group])) {
                         const group = team1Group;
                         const team1Stats = standings[group][match.team1];
                         const team2Stats = standings[group][match.team2];
@@ -1156,7 +1203,7 @@
             });
 
             Object.keys(standings).forEach((group) => {
-                if (!data.manualStandings[group]) {
+                if (!data.manualStandings || !data.manualStandings[group]) {
                     standings[group] = Object.values(standings[group]).sort(
                         (a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga)
                     );
@@ -1166,7 +1213,25 @@
             return standings;
         }
 
-        // Obter badge de status
+        // ============= Funções que escrevem no Firebase =============
+        function updateMatch(matchId, updates) {
+            ["petizes", "traquinas", "benjamins"].forEach(category => {
+                const catData = tournamentData[category];
+                if (!catData || !catData.matches) return;
+
+                catData.matches.forEach((m, idx) => {
+                    if (m.id === matchId) {
+                        db.ref(`tournament/${category}/matches/${idx}`).update(updates);
+                    }
+                });
+            });
+        }
+
+        function updateStandings(category, group, newStandings) {
+            db.ref(`tournament/${category}/manualStandings/${group}`).set(newStandings);
+        }
+
+        // ============= Renderização do Dashboard =============
         function getStatusBadge(status) {
             switch (status) {
                 case "live":
@@ -1187,14 +1252,18 @@
             }
         }
 
-        // Renderizar dashboard
         function renderDashboard() {
-            Object.keys(tournamentData).forEach((category) => {
+            // Só renderiza quando já carregamos todos os dados
+            if (!tournamentData.petizes || !tournamentData.traquinas || !tournamentData.benjamins) {
+                return;
+            }
+
+            ["petizes", "traquinas", "benjamins"].forEach((category) => {
                 const data = tournamentData[category];
                 const standings = calculateStandings(category);
-                
+
                 let html = `
-                    <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
+                    <div class="grid lg:grid-cols-2 gap-6">
                         <!-- Classificações -->
                         <div class="space-y-4">
                 `;
@@ -1227,8 +1296,8 @@
                     `;
 
                     if (standings[groupName]) {
-                        const standingsArray = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
-                        standingsArray.forEach((team, index) => {
+                        const arr = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
+                        arr.forEach((team, index) => {
                             html += `
                                 <div class="standings-row">
                                     <span class="position">${index + 1}º</span>
@@ -1262,16 +1331,17 @@
                             </h2>
                 `;
 
+                // Jornadas (1, 2, 3)
                 [1, 2, 3].forEach((jornada) => {
                     const jornadaMatches = data.matches.filter((match) => match.jornada === jornada);
-                    if (jornadaMatches.length === 0) return;
+                    if (!jornadaMatches || jornadaMatches.length === 0) return;
 
                     html += `
                         <div class="standings-card">
                             <div class="standings-header">
                                 <h3 class="standings-title">Jornada ${jornada}</h3>
                             </div>
-                            <div class="standings-content p-3 sm:p-6">
+                            <div class="standings-content p-6">
                                 <div class="space-y-3">
                     `;
 
@@ -1331,11 +1401,11 @@
                                 Finais
                             </h3>
                         </div>
-                        <div class="standings-content p-3 sm:p-6">
+                        <div class="standings-content p-6">
                             <div class="space-y-3">
                 `;
 
-                data.finals.forEach((final, index) => {
+                data.finals.forEach((final) => {
                     html += `
                         <div class="match-card bg-yellow-50 border-yellow-200">
                             <div class="match-header">
@@ -1345,7 +1415,9 @@
                                 <div class="match-time-field">
                                     <span class="match-time">${final.time}</span>
                                     <div class="match-field">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
                                             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
                                             <circle cx="12" cy="10" r="3"></circle>
                                         </svg>
@@ -1367,13 +1439,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
                 `;
 
                 document.getElementById(category).innerHTML = html;
             });
 
-            // Atualizar jogos ao vivo
+            // Mostrar ou esconder "Jogos ao Vivo"
             const liveMatches = tournamentData[activeCategory].matches.filter(match => match.status === "live");
             const liveMatchesContainer = document.getElementById('live-matches-container');
             const liveMatchesList = document.getElementById('live-matches-list');
@@ -1382,7 +1453,7 @@
             if (liveMatches.length > 0) {
                 liveMatchesContainer.style.display = 'block';
                 liveMatchesTitle.textContent = `Jogos ao Vivo - ${tournamentData[activeCategory].name}`;
-                
+
                 let liveMatchesHtml = '';
                 liveMatches.forEach(match => {
                     liveMatchesHtml += `
@@ -1413,9 +1484,9 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
                                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-                                        ` : ''}
+                                            </svg>
+                                        </button>
+                                    ` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1426,17 +1497,18 @@
                 liveMatchesContainer.style.display = 'none';
             }
 
-            // Adicionar event listeners para botões de edição de jogos
+            // Estabelece event listeners para botões "Editar" após re-render
             document.querySelectorAll('.edit-match-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const matchId = parseInt(this.getAttribute('data-match-id'));
                     let match = null;
-                    
-                    Object.keys(tournamentData).forEach(category => {
-                        const foundMatch = tournamentData[category].matches.find(m => m.id === matchId);
-                        if (foundMatch) match = foundMatch;
+
+                    // Encontrar o jogo em todas as categorias
+                    ["petizes", "traquinas", "benjamins"].forEach(category => {
+                        const arr = tournamentData[category].matches || [];
+                        arr.forEach(m => { if (m.id === matchId) match = m; });
                     });
-                    
+
                     if (match) {
                         editingMatch = match;
                         document.getElementById('edit-teams').textContent = `${match.team1} vs ${match.team2}`;
@@ -1451,17 +1523,16 @@
                 });
             });
 
-            // Adicionar event listeners para botões de edição de classificações
             document.querySelectorAll('.edit-standings-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const category = this.getAttribute('data-category');
                     const group = this.getAttribute('data-group');
                     const standings = calculateStandings(category);
                     const groupStandings = Array.isArray(standings[group]) ? standings[group] : Object.values(standings[group]);
-                    
+
                     editingStandings = { category, group };
                     document.getElementById('standings-group-title').textContent = `${tournamentData[category].name} - Grupo ${group}`;
-                    
+
                     let html = '';
                     groupStandings.forEach((team, index) => {
                         html += `
@@ -1473,7 +1544,7 @@
                             </div>
                         `;
                     });
-                    
+
                     document.getElementById('standings-edit-list').innerHTML = `
                         <div class="grid grid-cols-4 gap-2 text-xs font-semibold text-gray-500 border-b pb-2 mb-2">
                             <span>Equipa</span>
@@ -1483,44 +1554,41 @@
                         </div>
                         ${html}
                     `;
-                    
+
                     document.getElementById('standings-modal').classList.add('active');
                 });
             });
         }
 
-        // Alternar entre tabs
+        // ============= Listeners para Tabs =============
         document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const tab = this.getAttribute('data-tab');
-                
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
-                
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
+
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 document.getElementById(tab).classList.add('active');
-                
+
                 activeCategory = tab;
                 renderDashboard();
             });
         });
 
-        // Login de administrador
-        document.getElementById('admin-login-btn').addEventListener('click', function() {
+        // ============= Modal e Botões de Login Admin =============
+        const ADMIN_PASSWORD = "admin2024";
+        document.getElementById('admin-login-btn').addEventListener('click', function () {
             document.getElementById('login-modal').classList.add('active');
             document.getElementById('password-input').value = '';
             document.getElementById('login-error').style.display = 'none';
         });
 
-        document.getElementById('cancel-login-btn').addEventListener('click', function() {
+        document.getElementById('cancel-login-btn').addEventListener('click', function () {
             document.getElementById('login-modal').classList.remove('active');
         });
 
-        document.getElementById('login-btn').addEventListener('click', function() {
+        document.getElementById('login-btn').addEventListener('click', function () {
             const password = document.getElementById('password-input').value;
             if (password === ADMIN_PASSWORD) {
                 isAdminMode = true;
@@ -1535,8 +1603,7 @@
             }
         });
 
-        // Logout de administrador
-        document.getElementById('admin-logout-btn').addEventListener('click', function() {
+        document.getElementById('admin-logout-btn').addEventListener('click', function () {
             isAdminMode = false;
             document.getElementById('admin-login-btn').style.display = 'inline-flex';
             document.getElementById('admin-logout-btn').style.display = 'none';
@@ -1544,12 +1611,11 @@
             renderDashboard();
         });
 
-        // Mostrar/ocultar password
-        document.getElementById('password-toggle').addEventListener('click', function() {
+        document.getElementById('password-toggle').addEventListener('click', function () {
             const passwordInput = document.getElementById('password-input');
             const eyeIcon = document.querySelector('.eye-icon');
             const eyeOffIcon = document.querySelector('.eye-off-icon');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.style.display = 'none';
@@ -1561,39 +1627,58 @@
             }
         });
 
-        // Editar jogo
-        document.getElementById('save-edit-btn').addEventListener('click', function() {
-            if (editingMatch) {
-                editingMatch.score1 = parseInt(document.getElementById('edit-score1').value) || 0;
-                editingMatch.score2 = parseInt(document.getElementById('edit-score2').value) || 0;
-                editingMatch.status = document.getElementById('edit-status').value;
-                
-                document.getElementById('edit-modal').classList.remove('active');
-                editingMatch = null;
-                renderDashboard();
+        document.getElementById('password-input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('login-btn').click();
             }
         });
 
-        document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    editingMatch = null;
+                    editingStandings = null;
+                }
+            });
+        });
+
+        // ============= Editar Jogo e Guardar no Firebase =============
+        document.getElementById('save-edit-btn').addEventListener('click', function () {
+            if (editingMatch) {
+                const updates = {
+                    score1: parseInt(document.getElementById('edit-score1').value) || 0,
+                    score2: parseInt(document.getElementById('edit-score2').value) || 0,
+                    status: document.getElementById('edit-status').value
+                };
+
+                updateMatch(editingMatch.id, updates);
+                document.getElementById('edit-modal').classList.remove('active');
+                editingMatch = null;
+            }
+        });
+
+        document.getElementById('cancel-edit-btn').addEventListener('click', function () {
             document.getElementById('edit-modal').classList.remove('active');
             editingMatch = null;
         });
 
-        // Editar classificações
-        document.getElementById('save-standings-btn').addEventListener('click', function() {
+        // ============= Editar Classificações e Guardar no Firebase =============
+        document.getElementById('save-standings-btn').addEventListener('click', function () {
             if (editingStandings) {
                 const newStandings = [];
                 const teams = document.querySelectorAll('.standings-points');
-                
+
                 teams.forEach(input => {
                     const team = input.getAttribute('data-team');
                     const points = parseInt(document.querySelector(`.standings-points[data-team="${team}"]`).value) || 0;
                     const played = parseInt(document.querySelector(`.standings-played[data-team="${team}"]`).value) || 0;
                     const wins = parseInt(document.querySelector(`.standings-wins[data-team="${team}"]`).value) || 0;
-                    
-                    const draws = Math.max(0, played - wins - Math.max(0, played - wins - Math.floor((points - wins * 3) / 1)));
+
+                    // Calcular empates e derrotas com base nos valores inseridos
+                    const draws = Math.max(0, played - wins - Math.max(0, played - wins - Math.floor((points - wins * 3))));
                     const losses = Math.max(0, played - wins - draws);
-                    
+
                     newStandings.push({
                         team,
                         points,
@@ -1605,39 +1690,40 @@
                         ga: 0
                     });
                 });
-                
-                tournamentData[editingStandings.category].manualStandings[editingStandings.group] = newStandings;
+
+                // Ordenar por pontos decrescentes
+                newStandings.sort((a, b) => b.points - a.points);
+
+                updateStandings(editingStandings.category, editingStandings.group, newStandings);
                 document.getElementById('standings-modal').classList.remove('active');
                 editingStandings = null;
-                renderDashboard();
             }
         });
 
-        document.getElementById('cancel-standings-btn').addEventListener('click', function() {
+        document.getElementById('cancel-standings-btn').addEventListener('click', function () {
             document.getElementById('standings-modal').classList.remove('active');
             editingStandings = null;
         });
 
-        // Pressionar Enter para login
-        document.getElementById('password-input').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('login-btn').click();
-            }
-        });
-
-        // Fechar modais clicando fora
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                    editingMatch = null;
-                    editingStandings = null;
+        // ============= Listeners do Firebase para Carregar Dados =============
+        function listenToCategory(category) {
+            const catRef = db.ref('tournament/' + category);
+            catRef.on('value', snapshot => {
+                const data = snapshot.val();
+                if (data === null) {
+                    // Se não existe dados no Firebase, usar dados iniciais
+                    console.log(`Inicializando dados para ${category}`);
+                    db.ref('tournament/' + category).set(initialTournamentData[category]);
+                    tournamentData[category] = initialTournamentData[category];
+                } else {
+                    tournamentData[category] = data;
                 }
+                renderDashboard();
             });
-        });
+        }
 
-        // Inicializar dashboard
-        renderDashboard();
+        // Fazer o listener para cada categoria
+        ['petizes', 'traquinas', 'benjamins'].forEach(cat => listenToCategory(cat));
     </script>
 </body>
 </html>

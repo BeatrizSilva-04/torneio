@@ -1218,30 +1218,33 @@
                 standings.II = {};
             }
 
-            // Se existem classificações manuais, usar essas
+            // Inicializar todas as equipas para cálculo automático SEMPRE
+            Object.entries(data.groups).forEach(([groupName, teams]) => {
+                standings[groupName] = {};
+                teams.forEach((team) => {
+                    standings[groupName][team] = {
+                        team,
+                        points: 0,
+                        played: 0,
+                        wins: 0,
+                        draws: 0,
+                        losses: 0,
+                        gf: 0,
+                        ga: 0,
+                    };
+                });
+            });
+
+            // Se existem classificações manuais, sobrescrever com essas
             if (data.manualStandings && data.manualStandings.I) {
                 standings.I = data.manualStandings.I;
-                if (category === 'petizes' && data.manualStandings.II) {
-                    standings.II = data.manualStandings.II;
-                }
-            } else {
-                // Inicializar todas as equipas para cálculo automático
-                Object.entries(data.groups).forEach(([groupName, teams]) => {
-                    teams.forEach((team) => {
-                        standings[groupName][team] = {
-                            team,
-                            points: 0,
-                            played: 0,
-                            wins: 0,
-                            draws: 0,
-                            losses: 0,
-                            gf: 0,
-                            ga: 0,
-                        };
-                    });
-                });
+            }
+            if (category === 'petizes' && data.manualStandings && data.manualStandings.II) {
+                standings.II = data.manualStandings.II;
+            }
 
-                // Calcular pontuações baseado nos jogos
+            // Se não há classificações manuais, calcular pontuações baseado nos jogos
+            if (!data.manualStandings || !data.manualStandings.I || (category === 'petizes' && !data.manualStandings.II)) {
                 data.matches.forEach((match) => {
                     if (match.status === "finished") {
                         let team1Group = null;
@@ -1252,7 +1255,7 @@
                             if (teams.includes(match.team2)) team2Group = groupName;
                         });
 
-                        if (team1Group && team2Group && team1Group === team2Group && (!data.manualStandings || !data.manualStandings[team1Group])) {
+                        if (team1Group && team2Group && team1Group === team2Group) {
                             const group = team1Group;
                             const team1Stats = standings[group][match.team1];
                             const team2Stats = standings[group][match.team2];
@@ -1281,15 +1284,16 @@
                         }
                     }
                 });
-
-                Object.keys(standings).forEach((group) => {
-                    if (!data.manualStandings || !data.manualStandings[group]) {
-                        standings[group] = Object.values(standings[group]).sort(
-                            (a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga)
-                        );
-                    }
-                });
             }
+
+            // Converter para arrays e ordenar
+            Object.keys(standings).forEach((group) => {
+                if (!data.manualStandings || !data.manualStandings[group]) {
+                    standings[group] = Object.values(standings[group]).sort(
+                        (a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga)
+                    );
+                }
+            });
 
             return standings;
         }

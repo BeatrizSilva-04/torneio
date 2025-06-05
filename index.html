@@ -1167,58 +1167,58 @@
 
         // ============= Função para calcular classificações =============
         function calculateStandings(category) {
-            const data = tournamentData[category];
-            if (!data) return { I: {} };
-            
-            const standings = { I: {} };
+    const data = tournamentData[category];
+    if (!data) return { I: {} };
+    
+    const standings = { I: {} };
 
-            // Se for categoria Petizes ou Traquinas, mantém a lógica dos dois grupos
-            if (category === 'petizes' || category === 'traquinas') {
-                standings.II = {};
-            }
+    // Se for categoria Petizes ou Traquinas, mantém a lógica dos dois grupos
+    if (category === 'petizes' || category === 'traquinas') {
+        standings.II = {};
+    }
 
-            // Inicializar todas as equipas para cálculo automático SEMPRE
-            Object.entries(data.groups).forEach(([groupName, teams]) => {
-                standings[groupName] = {};
-                teams.forEach((team) => {
-                    standings[groupName][team] = {
-                        team,
-                        points: 0,
-                        played: 0,
-                        wins: 0,
-                        draws: 0,
-                        losses: 0,
-                        gf: 0,
-                        ga: 0,
-                    };
-                });
-            });
+    // Inicializar todas as equipas para cálculo automático SEMPRE
+    Object.entries(data.groups).forEach(([groupName, teams]) => {
+        standings[groupName] = {};
+        teams.forEach((team) => {
+            standings[groupName][team] = {
+                team,
+                points: 0,
+                played: 0,
+                wins: 0,
+                draws: 0,
+                losses: 0,
+                gf: 0,
+                ga: 0,
+            };
+        });
+    });
 
-            // Se existem classificações manuais, sobrescrever com essas
-            if (data.manualStandings && data.manualStandings.I) {
-                standings.I = data.manualStandings.I;
-            }
-            if ((category === 'petizes' || category === 'traquinas') && data.manualStandings && data.manualStandings.II) {
-                standings.II = data.manualStandings.II;
-            }
+    // Se existem classificações manuais, sobrescrever com essas
+    Object.keys(standings).forEach(groupName => {
+        if (data.manualStandings && data.manualStandings[groupName]) {
+            standings[groupName] = data.manualStandings[groupName];
+        }
+    });
 
-            // Se não há classificações manuais, calcular pontuações baseado nos jogos
-            if (!data.manualStandings || !data.manualStandings.I || ((category === 'petizes' || category === 'traquinas') && !data.manualStandings.II)) {
-                data.matches.forEach((match) => {
-                    if (match.status === "finished") {
-                        let team1Group = null;
-                        let team2Group = null;
+    // Se não há classificações manuais, calcular pontuações baseado nos jogos
+    Object.keys(standings).forEach(groupName => {
+        if (!data.manualStandings || !data.manualStandings[groupName]) {
+            data.matches.forEach((match) => {
+                if (match.status === "finished") {
+                    let team1Group = null;
+                    let team2Group = null;
 
-                        Object.entries(data.groups).forEach(([groupName, teams]) => {
-                            if (teams.includes(match.team1)) team1Group = groupName;
-                            if (teams.includes(match.team2)) team2Group = groupName;
-                        });
+                    Object.entries(data.groups).forEach(([gName, teams]) => {
+                        if (teams.includes(match.team1)) team1Group = gName;
+                        if (teams.includes(match.team2)) team2Group = gName;
+                    });
 
-                        if (team1Group && team2Group && team1Group === team2Group) {
-                            const group = team1Group;
-                            const team1Stats = standings[group][match.team1];
-                            const team2Stats = standings[group][match.team2];
+                    if (team1Group && team2Group && team1Group === team2Group && team1Group === groupName) {
+                        const team1Stats = standings[groupName][match.team1];
+                        const team2Stats = standings[groupName][match.team2];
 
+                        if (team1Stats && team2Stats) {
                             team1Stats.played++;
                             team2Stats.played++;
                             team1Stats.gf += match.score1;
@@ -1242,20 +1242,22 @@
                             }
                         }
                     }
-                });
-            }
-
-            // Converter para arrays e ordenar
-            Object.keys(standings).forEach((group) => {
-                if (!data.manualStandings || !data.manualStandings[group]) {
-                    standings[group] = Object.values(standings[group]).sort(
-                        (a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga)
-                    );
                 }
             });
-
-            return standings;
         }
+    });
+
+    // Converter para arrays e ordenar
+    Object.keys(standings).forEach((group) => {
+        if (!data.manualStandings || !data.manualStandings[group]) {
+            standings[group] = Object.values(standings[group]).sort(
+                (a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga)
+            );
+        }
+    });
+
+    return standings;
+}
 
         // ============= Funções Firebase =============
         function updateMatch(matchId, updates) {

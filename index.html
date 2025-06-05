@@ -65,15 +65,6 @@
             pointer-events: none;
         }
 
-        /* .edition-number {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #fbbf24;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            line-height: 1;
-            margin-bottom: 0.25rem;
-        } */
-
         .date-text {
             font-size: 0.875rem;
             color: #e0f2fe;
@@ -330,6 +321,15 @@
         .games {
             color: #6b7280;
             text-align: center;
+        }
+
+        .group-separator {
+            background-color: #f3f4f6;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+            border-bottom: 2px solid #e5e7eb;
         }
 
         .input {
@@ -1381,21 +1381,15 @@
                         <div class="space-y-4">
                 `;
 
-                Object.entries(data.groups).forEach(([groupName, teams]) => {
-                    const isManual = data.manualStandings && data.manualStandings[groupName];
+                // Para Petizes, criar uma única tabela com ambos os grupos
+                if (category === 'petizes') {
                     html += `
                         <div class="standings-card">
                             <div class="standings-header flex items-center justify-between">
-                                <h3 class="standings-title">Grupo ${groupName}</h3>
+                                <h3 class="standings-title">Classificação</h3>
                                 ${isAdminMode ? `
                                     <div class="flex items-center gap-2">
-                                        ${isManual ? '<span class="badge badge-outline text-xs">Manual</span>' : '<span class="badge badge-outline text-xs">Auto</span>'}
-                                        <button class="btn btn-outline btn-sm edit-standings-btn" data-category="${category}" data-group="${groupName}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                            </svg>
-                                        </button>
+                                        <span class="badge badge-outline text-xs">Auto</span>
                                     </div>
                                 ` : ''}
                             </div>
@@ -1408,8 +1402,26 @@
                                 </div>
                     `;
 
-                    if (standings[groupName]) {
-                        const arr = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
+                    // Grupo I
+                    html += `<div class="group-separator">GRUPO I</div>`;
+                    if (standings.I) {
+                        const arr = Array.isArray(standings.I) ? standings.I : Object.values(standings.I);
+                        arr.forEach((team, index) => {
+                            html += `
+                                <div class="standings-row">
+                                    <span class="position">${index + 1}º</span>
+                                    <span class="team-name">${team.team}</span>
+                                    <span class="points">${team.points}</span>
+                                    <span class="games">${team.played}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    // Grupo II
+                    html += `<div class="group-separator">GRUPO II</div>`;
+                    if (standings.II) {
+                        const arr = Array.isArray(standings.II) ? standings.II : Object.values(standings.II);
                         arr.forEach((team, index) => {
                             html += `
                                 <div class="standings-row">
@@ -1426,7 +1438,55 @@
                             </div>
                         </div>
                     `;
-                });
+                } else {
+                    // Para outras categorias, manter a lógica original
+                    Object.entries(data.groups).forEach(([groupName, teams]) => {
+                        const isManual = data.manualStandings && data.manualStandings[groupName];
+                        html += `
+                            <div class="standings-card">
+                                <div class="standings-header flex items-center justify-between">
+                                    <h3 class="standings-title">Grupo ${groupName}</h3>
+                                    ${isAdminMode ? `
+                                        <div class="flex items-center gap-2">
+                                            ${isManual ? '<span class="badge badge-outline text-xs">Manual</span>' : '<span class="badge badge-outline text-xs">Auto</span>'}
+                                            <button class="btn btn-outline btn-sm edit-standings-btn" data-category="${category}" data-group="${groupName}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div class="standings-content">
+                                    <div class="standings-table-header">
+                                        <span>Pos</span>
+                                        <span>Equipa</span>
+                                        <span>Pts</span>
+                                        <span>J</span>
+                                    </div>
+                        `;
+
+                        if (standings[groupName]) {
+                            const arr = Array.isArray(standings[groupName]) ? standings[groupName] : Object.values(standings[groupName]);
+                            arr.forEach((team, index) => {
+                                html += `
+                                    <div class="standings-row">
+                                        <span class="position">${index + 1}º</span>
+                                        <span class="team-name">${team.team}</span>
+                                        <span class="points">${team.points}</span>
+                                        <span class="games">${team.played}</span>
+                                    </div>
+                                `;
+                            });
+                        }
+
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
 
                 html += `
                         </div>

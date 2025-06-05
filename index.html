@@ -771,7 +771,7 @@
     </div>
 
     <script>
-        // ============ Variáveis de Estado =============
+        // ============= Variáveis de Estado =============
         let tournamentData = {
             petizes: null,
             traquinas: null,
@@ -941,17 +941,19 @@
             traquinas: {
                 name: "Traquinas",
                 groups: {
-                    I: ["Armil", "Fornelos B", "Marinhão", "Fornelos A", "Quinchães"]
+                    I: ["Armil", "Fornelos B", "Quinchães"],
+                    II: ["Fornelos A", "Selho", "Marinhão"]
                 },
                 manualStandings: {
-                    I: null
+                    I: null,
+                    II: null
                 },
                 matches: [
                     // Jornada 1
                     {
                         id: 13,
                         time: "14h30",
-                        team1: "Quinchães",
+                        team1: "Fornelos B",
                         team2: "Armil",
                         field: "Campo Dudidi",
                         jornada: 1,
@@ -963,7 +965,7 @@
                         id: 14,
                         time: "14h30",
                         team1: "Marinhão",
-                        team2: "Fornelos B",
+                        team2: "Selho",
                         field: "Campo Predimed",
                         jornada: 1,
                         status: "upcoming",
@@ -974,8 +976,8 @@
                     {
                         id: 15,
                         time: "15h15",
-                        team1: "Armil",
-                        team2: "Marinhão",
+                        team1: "Quinchães",
+                        team2: "Fornelos B",
                         field: "Campo Gsport",
                         jornada: 2,
                         status: "upcoming",
@@ -986,7 +988,7 @@
                         id: 16,
                         time: "15h15",
                         team1: "Fornelos A",
-                        team2: "Fornelos B",
+                        team2: "Selho",
                         field: "Campo Farmácia Albarelos",
                         jornada: 2,
                         status: "upcoming",
@@ -997,7 +999,7 @@
                     {
                         id: 17,
                         time: "16h",
-                        team1: "Fornelos A",
+                        team1: "Quinchães",
                         team2: "Armil",
                         field: "Campo Dudidi",
                         jornada: 3,
@@ -1008,7 +1010,7 @@
                     {
                         id: 18,
                         time: "16h",
-                        team1: "Quinchães",
+                        team1: "Fornelos A",
                         team2: "Marinhão",
                         field: "Campo Predimed",
                         jornada: 3,
@@ -1016,54 +1018,11 @@
                         score1: 0,
                         score2: 0,
                     },
-                    // Jornada 4
-                    {
-                        id: 19,
-                        time: "17h15",
-                        team1: "Fornelos B",
-                        team2: "Armil",
-                        field: "Campo Gsport",
-                        jornada: 4,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 20,
-                        time: "17h15",
-                        team1: "Quinchães",
-                        team2: "Fornelos A",
-                        field: "Campo Farmácia Albarelos",
-                        jornada: 4,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    // Jornada 5
-                    {
-                        id: 21,
-                        time: "18h",
-                        team1: "Fornelos B",
-                        team2: "Quinchães",
-                        field: "Campo Dudidi",
-                        jornada: 5,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
-                    {
-                        id: 22,
-                        time: "18h",
-                        team1: "Marinhão",
-                        team2: "Fornelos A",
-                        field: "Campo Predimed",
-                        jornada: 5,
-                        status: "upcoming",
-                        score1: 0,
-                        score2: 0,
-                    },
                 ],
                 finals: [
+                    { time: "17h15", match: "3º lugar Grupo I vs 3º lugar Grupo II", field: "Campo Gsport" },
+                    { time: "17h15", match: "2º lugar Grupo I vs 2º lugar Grupo II", field: "Campo Farmácia Albarelos" },
+                    { time: "18h", match: "1º lugar Grupo I vs 1º lugar Grupo II", field: "Campo Dudidi" },
                     { time: "18h45-19h", match: "Entrega de Prémios", field: "" },
                 ],
             },
@@ -1213,8 +1172,8 @@
             
             const standings = { I: {} };
 
-            // Se for categoria Petizes, mantém a lógica dos dois grupos
-            if (category === 'petizes') {
+            // Se for categoria Petizes ou Traquinas, mantém a lógica dos dois grupos
+            if (category === 'petizes' || category === 'traquinas') {
                 standings.II = {};
             }
 
@@ -1239,12 +1198,12 @@
             if (data.manualStandings && data.manualStandings.I) {
                 standings.I = data.manualStandings.I;
             }
-            if (category === 'petizes' && data.manualStandings && data.manualStandings.II) {
+            if ((category === 'petizes' || category === 'traquinas') && data.manualStandings && data.manualStandings.II) {
                 standings.II = data.manualStandings.II;
             }
 
             // Se não há classificações manuais, calcular pontuações baseado nos jogos
-            if (!data.manualStandings || !data.manualStandings.I || (category === 'petizes' && !data.manualStandings.II)) {
+            if (!data.manualStandings || !data.manualStandings.I || ((category === 'petizes' || category === 'traquinas') && !data.manualStandings.II)) {
                 data.matches.forEach((match) => {
                     if (match.status === "finished") {
                         let team1Group = null;
@@ -1381,15 +1340,23 @@
                         <div class="space-y-4">
                 `;
 
-                // Para Petizes, criar uma única tabela com ambos os grupos
-                if (category === 'petizes') {
+                // Para Petizes e Traquinas, criar duas tabelas separadas
+                if (category === 'petizes' || category === 'traquinas') {
+                    // Renderizar Grupo I
+                    const isManualI = data.manualStandings && data.manualStandings.I;
                     html += `
                         <div class="standings-card">
                             <div class="standings-header flex items-center justify-between">
-                                <h3 class="standings-title">Classificação</h3>
+                                <h3 class="standings-title">Grupo I</h3>
                                 ${isAdminMode ? `
                                     <div class="flex items-center gap-2">
-                                        <span class="badge badge-outline text-xs">Auto</span>
+                                        ${isManualI ? '<span class="badge badge-outline text-xs">Manual</span>' : '<span class="badge badge-outline text-xs">Auto</span>'}
+                                        <button class="btn btn-outline btn-sm edit-standings-btn" data-category="${category}" data-group="I">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button>
                                     </div>
                                 ` : ''}
                             </div>
@@ -1402,9 +1369,7 @@
                                 </div>
                     `;
 
-                    // Grupo I
-                    html += `<div class="group-separator">GRUPO I</div>`;
-                    if (standings.I) {
+                    if (standings.I && Object.keys(standings.I).length > 0) {
                         const arr = Array.isArray(standings.I) ? standings.I : Object.values(standings.I);
                         arr.forEach((team, index) => {
                             html += `
@@ -1418,9 +1383,39 @@
                         });
                     }
 
-                    // Grupo II
-                    html += `<div class="group-separator">GRUPO II</div>`;
-                    if (standings.II) {
+                    html += `
+                            </div>
+                        </div>
+                    `;
+
+                    // Renderizar Grupo II
+                    const isManualII = data.manualStandings && data.manualStandings.II;
+                    html += `
+                        <div class="standings-card">
+                            <div class="standings-header flex items-center justify-between">
+                                <h3 class="standings-title">Grupo II</h3>
+                                ${isAdminMode ? `
+                                    <div class="flex items-center gap-2">
+                                        ${isManualII ? '<span class="badge badge-outline text-xs">Manual</span>' : '<span class="badge badge-outline text-xs">Auto</span>'}
+                                        <button class="btn btn-outline btn-sm edit-standings-btn" data-category="${category}" data-group="II">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="standings-content">
+                                <div class="standings-table-header">
+                                    <span>Pos</span>
+                                    <span>Equipa</span>
+                                    <span>Pts</span>
+                                    <span>J</span>
+                                </div>
+                    `;
+
+                    if (standings.II && Object.keys(standings.II).length > 0) {
                         const arr = Array.isArray(standings.II) ? standings.II : Object.values(standings.II);
                         arr.forEach((team, index) => {
                             html += `
@@ -1587,7 +1582,7 @@
                                     <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
                                     <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
                                 </svg>
-                                ${category === "petizes" ? "Finais" : "Entrega de Prémios"}
+                                ${category === "petizes" ? "Finais" : category === "traquinas" ? "Finais e Entrega de Prémios" : "Entrega de Prémios"}
                             </h3>
                         </div>
                         <div class="standings-content p-6">
@@ -1595,7 +1590,7 @@
                 `;
 
                 data.finals.forEach((final) => {
-                    if (category === "petizes") {
+                    if (category === "petizes" || (category === "traquinas" && final.field)) {
                         html += `
                             <div class="match-card bg-yellow-50 border-yellow-200">
                                 <div class="match-header">
@@ -1604,13 +1599,15 @@
                                 <div class="match-info">
                                     <div class="match-time-field">
                                         <span class="match-time">${final.time}</span>
-                                        <div class="match-field">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
-                                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                                <circle cx="12" cy="10" r="3"></circle>
-                                            </svg>
-                                            <span>${final.field}</span>
-                                        </div>
+                                        ${final.field ? `
+                                            <div class="match-field">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                                    <circle cx="12" cy="10" r="3"></circle>
+                                                </svg>
+                                                <span>${final.field}</span>
+                                            </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
